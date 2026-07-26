@@ -157,6 +157,15 @@ fn install_shortcut() -> Result<()> {
 
 # Make DBUS available when launched from a keyboard shortcut
 export DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$(id -u)/bus"
+# Ensure cargo bin is in PATH (may be missing in shortcut context)
+export PATH="$HOME/.cargo/bin:$PATH"
+
+# Log file for debugging
+LOGFILE="$HOME/.local/share/promptbridge/pb-translate.log"
+mkdir -p "$(dirname "$LOGFILE")"
+log() { echo "[$(date '+%H:%M:%S')] $1" >> "$LOGFILE"; }
+
+log "=== pb-translate started ==="
 
 # 1. Clear clipboard to detect if text was actually selected
 OLD_CLIP=$(xclip -selection clipboard -o 2>/dev/null)
@@ -168,37 +177,52 @@ sleep 0.1
 
 # 3. Get text from clipboard
 TEXTO=$(xclip -selection clipboard -o 2>/dev/null)
+log "Input: $TEXTO"
 
 # If nothing was copied, restore old clipboard and exit gracefully
 if [ -z "$TEXTO" ]; then
+    log "No text selected — exiting"
     echo -n "$OLD_CLIP" | xclip -selection clipboard
     exit 0
 fi
 
-# 4. Translate with a visible progress dialog
-RESULT=$(promptbridge --copy translate "$TEXTO" 2>&1 &
-PB_PID=$!
-zenity --progress --pulsate --no-cancel --auto-close --title="PromptBridge" --text="Translating..." --width=300 &
+# 4. Show pulsating progress dialog while translating
+zenity --progress --pulsate --no-cancel --title="PromptBridge" --text="Translating..." --width=300 &
 ZEN_PID=$!
-wait $PB_PID
-kill $ZEN_PID 2>/dev/null
-xclip -selection clipboard -o 2>/dev/null)
 
-# 5. Show translated text in a modal for review
-if [ -n "$RESULT" ]; then
-    zenity --text-info --title="PromptBridge — Translation Result" --width=600 --height=400 --ok-label="Paste" --cancel-label="Cancel" <<< "$RESULT"
+# 5. Run translation (synchronously, capture output)
+RESULT=$(promptbridge translate "$TEXTO" 2>>"$LOGFILE")
+EXIT_CODE=$?
+log "Exit code: $EXIT_CODE | Result: $RESULT"
+
+# 6. Close the progress dialog
+kill $ZEN_PID 2>/dev/null
+wait $ZEN_PID 2>/dev/null
+
+# 7. Show result in a modal with Paste / Cancel
+if [ $EXIT_CODE -eq 0 ] && [ -n "$RESULT" ]; then
+    zenity --text-info \
+        --title="PromptBridge — Translation Result" \
+        --width=600 --height=400 \
+        --ok-label="Paste" --cancel-label="Cancel" \
+        <<< "$RESULT"
     if [ $? -eq 0 ]; then
-        # User clicked "Paste" — paste translated text
         echo -n "$RESULT" | xclip -selection clipboard
         xdotool key ctrl+v
+        log "Pasted successfully"
     else
-        # User clicked "Cancel" — restore old clipboard
         echo -n "$OLD_CLIP" | xclip -selection clipboard
+        log "User cancelled"
     fi
 else
-    zenity --error --title="PromptBridge" --text="Translation failed. Check your config at:\n~/.config/promptbridge/promptbridge.toml" --width=400
+    zenity --error \
+        --title="PromptBridge" \
+        --text="Translation failed.\nSee log for details:\n$LOGFILE" \
+        --width=450
     echo -n "$OLD_CLIP" | xclip -selection clipboard
 fi
+
+log "=== pb-translate done ==="
 "#;
 
         std::fs::write(&script_path, script_content)?;
