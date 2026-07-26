@@ -23,15 +23,15 @@ sudo apt install xclip xdotool -y
 cargo install promptbridge
 ```
 
-### Step 3: Run the Auto-Installer
-To configure your local configuration and generate the translation keyboard shortcut runner, run:
+### Step 4: Run the Auto-Installer
+To generate the translation keyboard shortcut runner and default configuration, run:
 ```bash
 promptbridge install-shortcut
 ```
 
-*This command automatically creates your configuration file at `~/.config/promptbridge/promptbridge.toml` and installs the helper script.*
+> **Important**: This command creates your global configuration file at `~/.config/promptbridge/promptbridge.toml`. Make sure to open this file and configure your AI provider (e.g., set your OpenAI API key or custom Ollama URL) for it to work!
 
-### Step 4: Configure the System Hotkey
+### Step 5: Configure the System Hotkey
 * Open your system **Settings** -> **Keyboard** -> **Keyboard Shortcuts** -> **Custom Shortcuts (+)**.
 * Create a new shortcut:
   * **Name**: `PromptBridge Translate`
@@ -46,7 +46,7 @@ Inside **any** chat interface (terminal TUIs like `opencode`/`aider`, VS Code, o
 1. Type your prompt in your native language (e.g., `crie uma função em rust em src/main.rs`).
 2. Select/highlight the text.
 3. Press your hotkey (e.g., `Ctrl+Alt+T`).
-4. The text will be instantly translated to English with all pathnames and code blocks protected!
+4. The text will be instantly translated to English with all pathnames and code blocks protected
 
 ---
 
