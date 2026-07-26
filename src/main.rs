@@ -155,12 +155,8 @@ fn install_shortcut() -> Result<()> {
         
         let script_content = r#"#!/bin/bash
 
-# Make notifications work when launched from a keyboard shortcut (no terminal session)
+# Make DBUS available when launched from a keyboard shortcut
 export DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$(id -u)/bus"
-
-notify() {
-    command -v notify-send >/dev/null && notify-send -t "$1" "PromptBridge" "$2"
-}
 
 # 1. Clear clipboard to detect if text was actually selected
 OLD_CLIP=$(xclip -selection clipboard -o 2>/dev/null)
@@ -179,17 +175,30 @@ if [ -z "$TEXTO" ]; then
     exit 0
 fi
 
-# 4. Show "Translating..." notification
-notify 5000 "Translating..."
+# 4. Translate with a visible progress dialog
+RESULT=$(promptbridge --copy translate "$TEXTO" 2>&1 &
+PB_PID=$!
+zenity --progress --pulsate --no-cancel --auto-close --title="PromptBridge" --text="Translating..." --width=300 &
+ZEN_PID=$!
+wait $PB_PID
+kill $ZEN_PID 2>/dev/null
+xclip -selection clipboard -o 2>/dev/null)
 
-# 5. Translate via PromptBridge (copies result automatically)
-promptbridge --copy translate "$TEXTO"
-
-# 6. Paste translated text
-xdotool key ctrl+v
-
-# 7. Show "Done" notification
-notify 2000 "Done! ✓"
+# 5. Show translated text in a modal for review
+if [ -n "$RESULT" ]; then
+    zenity --text-info --title="PromptBridge — Translation Result" --width=600 --height=400 --ok-label="Paste" --cancel-label="Cancel" <<< "$RESULT"
+    if [ $? -eq 0 ]; then
+        # User clicked "Paste" — paste translated text
+        echo -n "$RESULT" | xclip -selection clipboard
+        xdotool key ctrl+v
+    else
+        # User clicked "Cancel" — restore old clipboard
+        echo -n "$OLD_CLIP" | xclip -selection clipboard
+    fi
+else
+    zenity --error --title="PromptBridge" --text="Translation failed. Check your config at:\n~/.config/promptbridge/promptbridge.toml" --width=400
+    echo -n "$OLD_CLIP" | xclip -selection clipboard
+fi
 "#;
 
         std::fs::write(&script_path, script_content)?;

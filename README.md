@@ -4,7 +4,7 @@ Translates coding prompts from your native language (e.g., Portuguese) to anothe
 
 ---
 
-## Installation
+## Installation (Linux)
 
 ### Step 1: Install Rust & Cargo
 If you don't have Rust installed, install it first via [rustup](https://rustup.rs/):
@@ -13,9 +13,9 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 ```
 
 ### Step 2: Install dependencies (Linux)
-*Required to simulate the copy/paste keystrokes in the background when you press the hotkey.*
+*Required for clipboard access, keystroke simulation, and visual feedback dialogs.*
 ```bash
-sudo apt install xclip xdotool -y
+sudo apt install xclip xdotool zenity -y
 ```
 
 ### Step 3: Install PromptBridge

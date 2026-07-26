@@ -1,6 +1,6 @@
 [package]
 name = "promptbridge"
-version = "0.1.3"
+version = "0.1.4"
 edition = "2021"
 authors = ["PromptBridge Contributors"]
 description = "A clean, modular, CLI-agnostic Rust proxy gateway that translates and optimizes developer prompts while preserving technical content."
