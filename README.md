@@ -12,16 +12,8 @@ sudo apt install xclip xdotool -y
 ```
 
 ### Step 2: Install PromptBridge
-
-#### Option A: Via Cargo (Rust Package Manager)
 ```bash
 cargo install promptbridge
-```
-
-#### Option B: Via Homebrew (macOS / Linux)
-```bash
-brew tap pedroaugusto04/tap
-brew install promptbridge
 ```
 
 ### Step 3: Run the Auto-Installer
