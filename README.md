@@ -51,9 +51,43 @@ Inside **any** chat interface (terminal TUIs like `opencode`/`aider`, VS Code, o
 
 ---
 
-## Configuration
+## Customizing Configuration
 
-To change LLM models, API keys, or target endpoints, simply edit your global config file:
+You can customize your language, change providers, or adjust model settings at any time by editing the global config file:
 ```bash
 nano ~/.config/promptbridge/promptbridge.toml
+```
+
+### Config File Example & Options
+
+```toml
+[general]
+# The active provider to use ("ollama", "openai", "deepseek", or "mock")
+default_provider = "ollama"
+
+# Target language for translation (e.g., "en", "es", "fr", "pt")
+target_language = "en"
+
+# Timeout for requests in seconds (increase if model is slow to start/respond)
+request_timeout_seconds = 60
+
+# Automatically copy the translated prompt to the system clipboard
+auto_copy_clipboard = false
+
+# Safely extract and preserve paths/code during translation
+preserve_technical_terms = true
+
+[providers.ollama]
+type = "ollama"
+base_url = "http://localhost:11434"
+model = "llama3.2"
+temperature = 0.2  # Sampling temperature (lower = more deterministic, higher = creative)
+# api_key = "your-bearer-token-if-using-nginx-auth"
+
+[providers.openai]
+type = "openai"
+base_url = "https://api.openai.com/v1"
+api_key = "env:OPENAI_API_KEY"  # Reads from env var or you can paste raw key "sk-proj..."
+model = "gpt-4o-mini"
+temperature = 0.2
 ```
