@@ -1,6 +1,6 @@
 # PromptBridge
 
-Translates coding prompts from your native language (e.g., Portuguese) to English in place via a global hotkey, eliminating the need to manually open a translation tab. Safely preserves all code blocks, file paths, and terminal commands during translation.
+Translates coding prompts from your native language (e.g., Portuguese) to another language (e.g., English) in place via a global hotkey, eliminating the need to manually open a translation tab. Safely preserves all code blocks, file paths, and terminal commands during translation.
 
 ---
 
