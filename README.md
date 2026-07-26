@@ -1,8 +1,6 @@
 # PromptBridge
 
-Tired of opening a browser tab just to translate your coding prompt before sending it to your agent?
-
-PromptBridge lets you write prompts in your native language (e.g., Portuguese) and translates them to English in place (via a system hotkey) for AI coding agents (Claude, Aider, OpenCode, etc.), keeping code blocks, file paths, and terminal commands completely untouched.
+Translates coding prompts from your native language (e.g., Portuguese) to English in place via a global hotkey, eliminating the need to manually open a translation tab. Safely preserves all code blocks, file paths, and terminal commands during translation.
 
 ---
 
