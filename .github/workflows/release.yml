@@ -1,0 +1,59 @@
+name: Release Binaries
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-release:
+    name: Build (${{ matrix.target }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            artifact_name: promptbridge-linux-amd64
+            asset_name: promptbridge-x86_64-unknown-linux-gnu.tar.gz
+
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            artifact_name: promptbridge.exe
+            asset_name: promptbridge-x86_64-pc-windows-msvc.zip
+
+          - os: macos-latest
+            target: aarch64-apple-darwin
+            artifact_name: promptbridge-macos-arm64
+            asset_name: promptbridge-aarch64-apple-darwin.tar.gz
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Build release binary
+        run: cargo build --release --target ${{ matrix.target }}
+
+      - name: Package Binary (Unix)
+        if: matrix.os != 'windows-latest'
+        run: |
+          cd target/${{ matrix.target }}/release
+          tar -czvf ../../../${{ matrix.asset_name }} promptbridge
+
+      - name: Package Binary (Windows)
+        if: matrix.os == 'windows-latest'
+        shell: powershell
+        run: |
+          Compress-Archive -Path target/${{ matrix.target }}/release/promptbridge.exe -DestinationPath ${{ matrix.asset_name }}
+
+      - name: Upload GitHub Release Asset
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ${{ matrix.asset_name }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

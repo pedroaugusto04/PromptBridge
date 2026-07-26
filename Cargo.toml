@@ -1,0 +1,41 @@
+[package]
+name = "promptbridge"
+version = "0.1.0"
+edition = "2021"
+authors = ["PromptBridge Contributors"]
+description = "A clean, modular, CLI-agnostic Rust proxy gateway that translates and optimizes developer prompts while preserving technical content."
+readme = "README.md"
+keywords = ["cli", "prompt-engineering", "llm", "claude", "translation"]
+categories = ["command-line-utilities", "development-tools"]
+
+[dependencies]
+# CLI parsing & configuration
+clap = { version = "4.4", features = ["derive", "env"] }
+figment = { version = "0.10", features = ["toml", "env"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+toml = "0.8"
+dotenvy = "0.15"
+
+# Async runtime & HTTP client
+tokio = { version = "1.35", features = ["full"] }
+reqwest = { version = "0.11", features = ["json"] }
+async-trait = "0.1"
+
+# Text processing & AST parsing
+regex = "1.10"
+pulldown-cmark = "0.9"
+
+# Terminal & PTY proxy
+portable-pty = "0.8"
+arboard = "3.3"
+colored = "2.1"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# Error handling
+thiserror = "1.0"
+anyhow = "1.0"
+
+[dev-dependencies]
+tokio-test = "0.4"

@@ -1,0 +1,43 @@
+# PromptBridge Configuration Example
+
+[general]
+# Default provider to use: "ollama", "openai", or "mock"
+default_provider = "ollama"
+
+# Target language for prompt translation (e.g., "en", "es", "fr")
+target_language = "en"
+
+# Display mode for CLI Proxy Gateway ("preview" or "silent")
+# "preview": Visual update of the transformed prompt in the agent TUI
+# "silent": Transparently passes the transformed prompt to the backend
+mode = "preview"
+
+# Automatically copy transformed prompt to clipboard when running standard transform command
+auto_copy_clipboard = false
+
+# Enable strict preservation of technical terms (code blocks, paths, logs, commands)
+preserve_technical_terms = true
+
+[providers.ollama]
+type = "ollama"
+base_url = "http://localhost:11434"
+model = "llama3.2"
+temperature = 0.2
+
+[providers.openai]
+type = "openai"
+base_url = "https://api.openai.com/v1"
+api_key = "env:OPENAI_API_KEY" # Reads from environment variable or raw key string
+model = "gpt-4o-mini"
+temperature = 0.2
+
+[providers.deepseek]
+type = "openai"
+base_url = "https://api.deepseek.com/v1"
+api_key = "env:DEEPSEEK_API_KEY"
+model = "deepseek-coder"
+temperature = 0.2
+
+[providers.mock]
+type = "mock"
+temperature = 0.0
