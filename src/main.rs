@@ -171,11 +171,17 @@ if [ -z "$TEXTO" ]; then
     exit 0
 fi
 
-# 4. Translate via PromptBridge (copies result automatically)
+# 4. Show "Translating..." notification (timeout 2000ms)
+command -v notify-send >/dev/null && notify-send "PromptBridge" "Translating..." -t 2000
+
+# 5. Translate via PromptBridge (copies result automatically)
 promptbridge --copy translate "$TEXTO"
 
-# 5. Paste translated text
+# 6. Paste translated text
 xdotool key ctrl+v
+
+# 7. Show "Done" notification (timeout 1000ms)
+command -v notify-send >/dev/null && notify-send "PromptBridge" "Translation complete! 🚀" -t 1000
 "#;
 
         std::fs::write(&script_path, script_content)?;
