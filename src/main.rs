@@ -108,7 +108,7 @@ async fn run_app(cli: Cli) -> Result<()> {
                 println!("{}", toml_str);
             }
             Some(ConfigSubcommand::Path) => {
-                if let Some(user_config) = dirs_next::config_dir() {
+                if let Some(user_config) = dirs::config_dir() {
                     println!("{}", user_config.join("promptbridge").join("config.toml").display());
                 }
             }

@@ -26,7 +26,7 @@ impl ProviderFactory {
                 config.base_url.clone(),
                 config.model.clone(),
                 config.temperature,
-            ))),
+            )?)),
             "openai" | "openai-compatible" => Ok(Box::new(openai::OpenAiProvider::new(
                 config.base_url.clone(),
                 config.api_key.clone(),

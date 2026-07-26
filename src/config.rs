@@ -1,6 +1,5 @@
 use crate::constants::{
-    APP_NAME, CONFIG_FILE_NAME, DEFAULT_CONFIG_TOML, DEFAULT_OLLAMA_MODEL,
-    DEFAULT_TARGET_LANGUAGE, ENV_PREFIX,
+    APP_NAME, CONFIG_FILE_NAME, DEFAULT_CONFIG_TOML, DEFAULT_TARGET_LANGUAGE, ENV_PREFIX,
 };
 use crate::utils::error::{PromptBridgeError, Result};
 use figment::{
@@ -55,8 +54,10 @@ impl Config {
         // 1. Default config fallback from constants
         figment = figment.merge(Toml::string(DEFAULT_CONFIG_TOML));
 
-        // 2. Global user config (~/.config/promptbridge/config.toml)
-        if let Some(mut user_config) = dirs_next::config_dir() {
+        // 2. Global user config (~/.config/promptbridge/config.toml on Linux,
+        //    ~/Library/Application Support/promptbridge/config.toml on macOS,
+        //    %APPDATA%\promptbridge\config.toml on Windows)
+        if let Some(mut user_config) = dirs::config_dir() {
             user_config.push(APP_NAME);
             user_config.push(CONFIG_FILE_NAME);
             if user_config.exists() {
