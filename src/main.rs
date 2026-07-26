@@ -154,17 +154,27 @@ fn install_shortcut() -> Result<()> {
         let script_path = bin_dir.join("pb-translate");
         
         let script_content = r#"#!/bin/bash
-# 1. Copy selected text
+# 1. Clear clipboard to detect if text was actually selected
+OLD_CLIP=$(xclip -selection clipboard -o 2>/dev/null)
+xclip -selection clipboard /dev/null
+
+# 2. Copy selected text
 xdotool key ctrl+c
 sleep 0.1
 
-# 2. Get text from clipboard
-TEXTO=$(xclip -selection clipboard -o)
+# 3. Get text from clipboard
+TEXTO=$(xclip -selection clipboard -o 2>/dev/null)
 
-# 3. Translate via PromptBridge (copies result automatically)
+# If nothing was copied, restore old clipboard and exit gracefully
+if [ -z "$TEXTO" ]; then
+    echo -n "$OLD_CLIP" | xclip -selection clipboard
+    exit 0
+fi
+
+# 4. Translate via PromptBridge (copies result automatically)
 promptbridge --copy translate "$TEXTO"
 
-# 4. Paste translated text
+# 5. Paste translated text
 xdotool key ctrl+v
 "#;
 
