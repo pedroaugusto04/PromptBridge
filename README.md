@@ -1,6 +1,6 @@
 # PromptBridge
 
-Simple tool that translates prompts for AI coding agents (Claude, Aider, OpenCode, etc.) while preserving code, paths, and technical terms.
+Simple tool that allows you to write prompts in your native language (e.g., Portuguese) and translates them to English for AI coding agents (Claude, Aider, OpenCode, etc.) while keeping code, paths, and terminal commands completely untouched.
 
 ---
 
@@ -81,13 +81,13 @@ preserve_technical_terms = true
 type = "ollama"
 base_url = "http://localhost:11434"
 model = "llama3.2"
-temperature = 0.2  # Sampling temperature (lower = more deterministic, higher = creative)
-# api_key = "your-bearer-token-if-using-nginx-auth"
+temperature = 0
+# api_key = "your-bearer-token-if-using-bearer-auth"
 
 [providers.openai]
 type = "openai"
 base_url = "https://api.openai.com/v1"
-api_key = "env:OPENAI_API_KEY"  # Reads from env var or you can paste raw key "sk-proj..."
+api_key = "env:OPENAI_API_KEY"  
 model = "gpt-4o-mini"
 temperature = 0.2
 ```
