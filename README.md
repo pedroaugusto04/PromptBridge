@@ -80,13 +80,25 @@ scoop install promptbridge
 
 ### Configure Shell Aliases (Set it and Forget it)
 
-Add the following aliases to your shell profile (`~/.zshrc`, `~/.bashrc`, or `$PROFILE` on PowerShell):
+#### Linux / macOS (Bash & Zsh)
+Add the following aliases to your shell profile (e.g. `~/.bashrc` or `~/.zshrc`):
 
 ```bash
 alias claude="promptbridge exec -- claude"
 alias codex="promptbridge exec -- codex"
 alias opencode="promptbridge exec -- opencode"
 alias aider="promptbridge exec -- aider"
+```
+
+#### Windows (PowerShell)
+In PowerShell, standard aliases don't support arguments. Instead, you need to add functions to your profile (`$PROFILE`).
+Open your profile (`notepad $PROFILE`) and add:
+
+```powershell
+function claude { promptbridge exec -- claude @args }
+function codex { promptbridge exec -- codex @args }
+function opencode { promptbridge exec -- opencode @args }
+function aider { promptbridge exec -- aider @args }
 ```
 
 Now simply develop as you normally would. PromptBridge will intercept prompts, translate/optimize natural language to English, protect code/files, and pass them transparently!
