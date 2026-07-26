@@ -101,11 +101,26 @@ function opencode { promptbridge exec -- opencode @args }
 function aider { promptbridge exec -- aider @args }
 ```
 
-Now simply develop as you normally would. PromptBridge will intercept prompts, translate/optimize natural language to English, protect code/files, and pass them transparently!
+---
+
+## Daily Workflow
+
+Once the aliases are configured, **you will never need to call `promptbridge` directly**. You just use your AI agents normally, but now you can speak to them in your native language without worrying about it.
+
+Here is how your day-to-day will look:
+
+1. You open your terminal and type your normal agent command:
+   ```bash
+   claude "Crie um teste unitário para o arquivo src/api.rs"
+   ```
+2. Because of the alias, **PromptBridge** intercepts this transparently.
+3. PromptBridge parses `src/api.rs`, protects it, and translates your prompt to English (e.g., *"Create a unit test for the file __PB_PATH_1__"*).
+4. PromptBridge silently passes this optimized prompt to the actual `claude` CLI.
+5. Claude processes it, generates the code, and answers you. 
 
 ---
 
-## CLI Usage Examples
+## CLI Usage Examples (Manual Mode)
 
 ### Direct Transformation
 ```bash

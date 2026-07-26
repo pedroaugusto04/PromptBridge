@@ -25,3 +25,7 @@ target
 
 # Local development guide
 DEVELOPMENT.md
+
+# Temporary installers / downloaded binaries
+rustup-init.exe
+*.exe~
