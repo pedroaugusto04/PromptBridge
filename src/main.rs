@@ -167,13 +167,17 @@ log() { echo "[$(date '+%H:%M:%S')] $1" >> "$LOGFILE"; }
 
 log "=== pb-translate started ==="
 
+# Save the focused window IMMEDIATELY before anything changes focus
+FOCUSED_WIN=$(xdotool getwindowfocus 2>/dev/null)
+log "Focused window: $FOCUSED_WIN"
+
 # 1. Clear clipboard to detect if text was actually selected
 OLD_CLIP=$(xclip -selection clipboard -o 2>/dev/null)
-xclip -selection clipboard /dev/null
+echo -n "" | xclip -selection clipboard
 
-# 2. Copy selected text
-xdotool key ctrl+c
-sleep 0.1
+# 2. Send Ctrl+C to the previously focused window specifically
+xdotool key --window "$FOCUSED_WIN" --clearmodifiers ctrl+c
+sleep 0.3
 
 # 3. Get text from clipboard
 TEXTO=$(xclip -selection clipboard -o 2>/dev/null)
