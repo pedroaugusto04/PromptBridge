@@ -75,7 +75,7 @@ target_language = "en"
 mode = "preview"
 auto_copy_clipboard = false
 preserve_technical_terms = true
-request_timeout_seconds = 30
+request_timeout_seconds = 60
 
 [providers.ollama]
 type = "ollama"

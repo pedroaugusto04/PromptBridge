@@ -22,6 +22,7 @@ target
 
 # Local env files
 .env
+promptbridge.toml
 
 # Local development guide
 DEVELOPMENT.md

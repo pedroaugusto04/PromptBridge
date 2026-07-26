@@ -20,8 +20,8 @@ preserve_technical_terms = true
 
 [providers.ollama]
 type = "ollama"
-base_url = "http://localhost:11434"
-model = "llama3.2"
+base_url = "https://pedro-duarte.ddns.net/ollama"
+model = "qwen-fast"
 temperature = 0.2
 
 [providers.openai]

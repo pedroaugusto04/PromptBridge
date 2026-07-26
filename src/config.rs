@@ -1,9 +1,9 @@
 use crate::constants::{
-    APP_NAME, CONFIG_FILE_NAME, DEFAULT_CONFIG_TOML, DEFAULT_TARGET_LANGUAGE, ENV_PREFIX,
+    APP_NAME, CONFIG_FILE_NAME, DEFAULT_CONFIG_TOML, DEFAULT_TARGET_LANGUAGE,
 };
 use crate::utils::error::{PromptBridgeError, Result};
 use figment::{
-    providers::{Env, Format, Toml},
+    providers::{Format, Toml},
     Figment,
 };
 use serde::{Deserialize, Serialize};
@@ -79,11 +79,13 @@ impl Config {
         }
 
         // 5. Environment variables (PROMPTBRIDGE_*)
-        figment = figment.merge(Env::prefixed(ENV_PREFIX).split("_"));
 
-        let config: Config = figment
+        let mut config: Config = figment
             .extract()
             .map_err(|e| PromptBridgeError::Config(format!("Failed to parse config: {}", e)))?;
+
+        // Apply general env overrides
+        apply_env_overrides(&mut config);
 
         Ok(config)
     }
@@ -97,5 +99,61 @@ impl Config {
                     self.general.default_provider
                 ))
             })
+    }
+}
+
+/// Apply environment variable overrides directly to the config after figment extraction.
+///
+/// figment's `Env::split("_")` cannot handle field names that contain underscores
+/// (e.g. `base_url`, `default_provider`) inside nested structs, so we apply
+/// the documented PROMPTBRIDGE_* env vars explicitly here.
+fn apply_env_overrides(config: &mut Config) {
+    // --- General settings ---
+    if let Ok(v) = std::env::var("PROMPTBRIDGE_GENERAL_DEFAULT_PROVIDER") {
+        config.general.default_provider = v;
+    }
+    if let Ok(v) = std::env::var("PROMPTBRIDGE_TARGET_LANGUAGE") {
+        config.general.target_language = v;
+    }
+    if let Ok(v) = std::env::var("PROMPTBRIDGE_MODE") {
+        config.general.mode = v;
+    }
+
+    // --- Ollama provider ---
+    if let Some(ollama) = config.providers.get_mut("ollama") {
+        if let Ok(v) = std::env::var("PROMPTBRIDGE_OLLAMA_BASE_URL") {
+            ollama.base_url = Some(v);
+        }
+        if let Ok(v) = std::env::var("PROMPTBRIDGE_OLLAMA_MODEL") {
+            ollama.model = Some(v);
+        }
+        if let Ok(v) = std::env::var("PROMPTBRIDGE_OLLAMA_API_KEY") {
+            ollama.api_key = Some(v);
+        }
+        if let Ok(v) = std::env::var("PROMPTBRIDGE_TEMPERATURE") {
+            if let Ok(f) = v.parse::<f32>() {
+                ollama.temperature = Some(f);
+            }
+        }
+    }
+
+    // --- OpenAI provider ---
+    if let Some(openai) = config.providers.get_mut("openai") {
+        if let Ok(v) = std::env::var("PROMPTBRIDGE_OPENAI_BASE_URL") {
+            openai.base_url = Some(v);
+        }
+        if let Ok(v) = std::env::var("PROMPTBRIDGE_OPENAI_MODEL") {
+            openai.model = Some(v);
+        }
+        if let Ok(v) = std::env::var("OPENAI_API_KEY") {
+            openai.api_key = Some(v);
+        }
+    }
+
+    // --- DeepSeek provider ---
+    if let Some(deepseek) = config.providers.get_mut("deepseek") {
+        if let Ok(v) = std::env::var("DEEPSEEK_API_KEY") {
+            deepseek.api_key = Some(v);
+        }
     }
 }

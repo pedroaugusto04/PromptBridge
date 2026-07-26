@@ -11,6 +11,7 @@ pub struct OllamaProvider {
     base_url: String,
     model: String,
     temperature: f32,
+    auth_token: Option<String>,
 }
 
 impl OllamaProvider {
@@ -18,6 +19,7 @@ impl OllamaProvider {
         base_url: Option<String>,
         model: Option<String>,
         temperature: Option<f32>,
+        auth_token: Option<String>,
     ) -> Result<Self> {
         let base_url = base_url.unwrap_or_else(get_ollama_base_url);
         let model = model.unwrap_or_else(get_ollama_model);
@@ -37,6 +39,7 @@ impl OllamaProvider {
             base_url,
             model,
             temperature,
+            auth_token,
         })
     }
 }
@@ -101,10 +104,17 @@ impl LlmProvider for OllamaProvider {
             },
         };
 
-        let res = self
+        let mut request_builder = self
             .client
             .post(&url)
-            .json(&payload)
+            .json(&payload);
+
+        // Add Authorization header if an auth token is configured
+        if let Some(token) = &self.auth_token {
+            request_builder = request_builder.bearer_auth(token);
+        }
+
+        let res = request_builder
             .send()
             .await
             .map_err(|e| {

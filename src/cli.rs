@@ -26,7 +26,7 @@ pub struct Cli {
     pub target_lang: Option<String>,
 
     /// Copy transformed prompt to system clipboard
-    #[arg(short, long)]
+    #[arg(long)]
     pub copy: bool,
 
     /// Dry-run mode (simulates parsing and transformation without invoking remote LLMs)
@@ -80,6 +80,9 @@ pub enum Commands {
 
     /// List configured LLM providers
     Providers,
+
+    /// Install the global keyboard shortcut helper script (Linux/GNOME)
+    InstallShortcut,
 }
 
 #[derive(Subcommand, Debug)]

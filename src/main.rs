@@ -126,6 +126,65 @@ async fn run_app(cli: Cli) -> Result<()> {
                 ));
             }
         }
+
+        Commands::InstallShortcut => {
+            install_shortcut()?;
+        }
+    }
+
+    Ok(())
+}
+
+fn install_shortcut() -> Result<()> {
+    // 1. Create default config file if it does not exist
+    if let Some(mut user_config_dir) = dirs::config_dir() {
+        user_config_dir.push("promptbridge");
+        std::fs::create_dir_all(&user_config_dir)?;
+        let config_file = user_config_dir.join("promptbridge.toml");
+        if !config_file.exists() {
+            std::fs::write(&config_file, promptbridge::constants::DEFAULT_CONFIG_TOML)?;
+            println!("✓ Created global config template at: {}", config_file.display());
+        }
+    }
+
+    // 2. Create the shortcut script in ~/.local/bin/pb-translate
+    if let Some(home_dir) = dirs::home_dir() {
+        let bin_dir = home_dir.join(".local").join("bin");
+        std::fs::create_dir_all(&bin_dir)?;
+        let script_path = bin_dir.join("pb-translate");
+        
+        let script_content = r#"#!/bin/bash
+# 1. Copy selected text
+xdotool key ctrl+c
+sleep 0.1
+
+# 2. Get text from clipboard
+TEXTO=$(xclip -selection clipboard -o)
+
+# 3. Translate via PromptBridge (copies result automatically)
+promptbridge --copy translate "$TEXTO"
+
+# 4. Paste translated text
+xdotool key ctrl+v
+"#;
+
+        std::fs::write(&script_path, script_content)?;
+        
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            let mut perms = std::fs::metadata(&script_path)?.permissions();
+            perms.set_mode(0o755);
+            std::fs::set_permissions(&script_path, perms)?;
+        }
+        
+        println!("✓ Created helper script at: {}", script_path.display());
+        println!("\n=== Installation complete ===");
+        println!("Please configure the keyboard shortcut in your OS Settings:");
+        println!("  Shortcut Command: pb-translate");
+        println!("  Example Shortcut Keys: Ctrl+Alt+T");
+    } else {
+        return Err(PromptBridgeError::Engine("Could not locate home directory".to_string()));
     }
 
     Ok(())
