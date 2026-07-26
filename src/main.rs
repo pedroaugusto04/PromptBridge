@@ -154,6 +154,14 @@ fn install_shortcut() -> Result<()> {
         let script_path = bin_dir.join("pb-translate");
         
         let script_content = r#"#!/bin/bash
+
+# Make notifications work when launched from a keyboard shortcut (no terminal session)
+export DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$(id -u)/bus"
+
+notify() {
+    command -v notify-send >/dev/null && notify-send -t "$1" "PromptBridge" "$2"
+}
+
 # 1. Clear clipboard to detect if text was actually selected
 OLD_CLIP=$(xclip -selection clipboard -o 2>/dev/null)
 xclip -selection clipboard /dev/null
@@ -171,8 +179,8 @@ if [ -z "$TEXTO" ]; then
     exit 0
 fi
 
-# 4. Show "Translating..." notification (timeout 2000ms)
-command -v notify-send >/dev/null && notify-send "PromptBridge" "Translating..." -t 2000
+# 4. Show "Translating..." notification
+notify 5000 "Translating..."
 
 # 5. Translate via PromptBridge (copies result automatically)
 promptbridge --copy translate "$TEXTO"
@@ -180,8 +188,8 @@ promptbridge --copy translate "$TEXTO"
 # 6. Paste translated text
 xdotool key ctrl+v
 
-# 7. Show "Done" notification (timeout 1000ms)
-command -v notify-send >/dev/null && notify-send "PromptBridge" "Translation complete! 🚀" -t 1000
+# 7. Show "Done" notification
+notify 2000 "Done! ✓"
 "#;
 
         std::fs::write(&script_path, script_content)?;
