@@ -29,7 +29,7 @@ To generate the translation keyboard shortcut runner and default configuration, 
 promptbridge install-shortcut
 ```
 
-> **Important**: This command creates your global configuration file at `~/.config/promptbridge/promptbridge.toml`. Make sure to open this file and configure your AI provider (e.g., set your OpenAI API key or custom Ollama URL) for it to work!
+> **Important**: This command creates your global configuration file at `~/.config/promptbridge/promptbridge.toml`. Make sure to open this file and configure your AI provider (e.g., set your OpenAI API key or custom Ollama URL)
 
 ### Step 5: Configure the System Hotkey
 * Open your system **Settings** -> **Keyboard** -> **Keyboard Shortcuts** -> **Custom Shortcuts (+)**.
