@@ -98,16 +98,38 @@ fi
 # Add to PATH if needed
 if [[ ":$PATH:" != *":$INSTALL_DIR:"* ]]; then
     echo ""
-    echo "⚠️  $INSTALL_DIR is not in your PATH."
-    echo "   Add the following to your shell profile (~/.bashrc, ~/.zshrc, etc.):"
-    echo "   export PATH=\"$INSTALL_DIR:\$PATH\""
+    echo "Adding $INSTALL_DIR to PATH..."
+    
+    # Detect shell and add to appropriate config file
+    SHELL_NAME=$(basename "$SHELL")
+    if [[ "$SHELL_NAME" == "bash" ]]; then
+        CONFIG_FILE="$HOME/.bashrc"
+    elif [[ "$SHELL_NAME" == "zsh" ]]; then
+        CONFIG_FILE="$HOME/.zshrc"
+    else
+        CONFIG_FILE="$HOME/.profile"
+    fi
+    
+    # Add PATH export if not already present
+    if ! grep -q "export PATH=\"$INSTALL_DIR" "$CONFIG_FILE" 2>/dev/null; then
+        echo "" >> "$CONFIG_FILE"
+        echo "# PromptBridge" >> "$CONFIG_FILE"
+        echo "export PATH=\"$INSTALL_DIR:\$PATH\"" >> "$CONFIG_FILE"
+        echo "✅ Added to PATH in $CONFIG_FILE"
+    else
+        echo "ℹ️  Already in PATH configuration"
+    fi
+    
+    echo ""
+    echo "⚠️  Please restart your terminal or run:"
+    echo "   source $CONFIG_FILE"
 fi
 
 echo ""
 echo "✅ PromptBridge installed successfully!"
 echo ""
 echo "Next steps:"
-echo "   1. Restart your shell or run: export PATH=\"$INSTALL_DIR:\$PATH\""
+echo "   1. Restart your terminal or run: source $CONFIG_FILE"
 echo "   2. Verify installation: promptbridge --version"
 echo "   3. Configure keyboard shortcut: promptbridge install-shortcut"
 echo ""
