@@ -70,8 +70,14 @@ osascript -e 'tell application "System Events" to display dialog "Translating...
 PROG_PID=$!
 
 # Run translation (synchronously, capture output)
-RAW_RESULT=$(promptbridge translate "$TEXTO" 2>>"$LOGFILE" 2>&1)
+RAW_RESULT=$(promptbridge translate "$TEXTO" 2>&1)
 EXIT_CODE=$?
+
+# Log stderr if command failed
+if [ $EXIT_CODE -ne 0 ]; then
+    log "Command failed with exit code: $EXIT_CODE"
+    log "Error output: $RAW_RESULT"
+fi
 
 # Extract only the translated text (after "--- Transformed Prompt ---")
 if [ -n "$RAW_RESULT" ]; then

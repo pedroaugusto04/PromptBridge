@@ -74,8 +74,13 @@ zenity --progress --pulsate --no-cancel --auto-close --title="PromptBridge" --te
 ZEN_PID=$!
 
 # 5. Run translation (synchronously, capture output)
-RAW_RESULT=$(promptbridge translate "$TEXTO" 2>>"$LOGFILE" 2>&1)
+RAW_RESULT=$(promptbridge translate "$TEXTO" 2>&1)
 EXIT_CODE=$?
+# Log stderr if command failed
+if [ $EXIT_CODE -ne 0 ]; then
+    log "Command failed with exit code: $EXIT_CODE"
+    log "Error output: $RAW_RESULT"
+fi
 # Extract only the translated text (after "--- Transformed Prompt ---")
 if [ -n "$RAW_RESULT" ]; then
     RESULT=$(echo "$RAW_RESULT" | grep -A 100 -- "--- Transformed Prompt ---" | tail -n +2)
@@ -126,7 +131,7 @@ if [ $EXIT_CODE -eq 0 ] && [ -n "$RESULT" ]; then
 else
     zenity --error \
         --title="PromptBridge" \
-        --text="Translation failed.\nSee log for details:\n$LOGFILE" \
+        --text="Translation failed (exit code: $EXIT_CODE).\nSee log for details:\n$LOGFILE" \
         --width=450
     echo -n "$OLD_CLIP" | xclip -selection clipboard
 fi

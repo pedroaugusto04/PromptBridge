@@ -98,8 +98,14 @@ $progressJob = Start-Job -ScriptBlock $progressScript
 
 try {
     # Run translation
-    $rawResult = & promptbridge translate $clipText 2>> $LogFile
+    $rawResult = & promptbridge translate $clipText 2>&1
     $exitCode = $LASTEXITCODE
+    
+    # Log stderr if command failed
+    if ($exitCode -ne 0) {
+        Log-Message "Command failed with exit code: $exitCode"
+        Log-Message "Error output: $rawResult"
+    }
     
     # Extract translated text (after "--- Transformed Prompt ---")
     if ($rawResult) {
