@@ -131,6 +131,9 @@ case ":$PATH:" in *":$INSTALL_DIR:"*) ;;
     else
         echo "Already in PATH configuration"
     fi
+    
+    # Add to current session PATH for immediate use
+    export PATH="$INSTALL_DIR:$PATH"
     ;;
 esac
 
@@ -138,11 +141,10 @@ echo ""
 echo "PromptBridge installed successfully!"
 echo ""
 echo "Next steps:"
+echo "   1. Run: promptbridge init-config"
+echo "   2. Run: promptbridge install-shortcut"
 if [ "$NEED_SOURCE" = true ]; then
-    echo "   1. Restart your terminal or run: source $CONFIG_FILE"
-else
-    echo "   1. Restart your terminal"
+    echo ""
+    echo "Note: PATH added to $CONFIG_FILE. Restart your terminal for permanent changes."
 fi
-echo "   2. Run: promptbridge init-config"
-echo "   3. Run: promptbridge install-shortcut"
 echo ""
