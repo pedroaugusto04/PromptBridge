@@ -175,7 +175,7 @@ async fn process_single_prompt(
     let provider: Box<dyn LlmProvider> = if dry_run {
         Box::new(promptbridge::providers::mock::MockProvider::new(None))
     } else {
-        ProviderFactory::create(provider_config)?
+        ProviderFactory::create(provider_config, config.general.keep_alive_interval_minutes)?
     };
 
     let result = TransformationPipeline::execute(

@@ -23,6 +23,7 @@ pub struct GeneralConfig {
     pub mode: String, // "preview" or "silent"
     pub auto_copy_clipboard: bool,
     pub preserve_technical_terms: bool,
+    pub keep_alive_interval_minutes: Option<u64>, // Keep-alive interval in minutes (default: 60)
 }
 
 impl Default for GeneralConfig {
@@ -33,6 +34,7 @@ impl Default for GeneralConfig {
             mode: "preview".to_string(),
             auto_copy_clipboard: false,
             preserve_technical_terms: true,
+            keep_alive_interval_minutes: Some(60), // Default: 60 minutes
         }
     }
 }

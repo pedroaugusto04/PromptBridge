@@ -61,6 +61,12 @@ pub fn get_request_timeout() -> Duration {
     Duration::from_secs(secs)
 }
 
+pub fn get_keep_alive_interval_minutes() -> Option<u64> {
+    std::env::var("PROMPTBRIDGE_KEEP_ALIVE_INTERVAL_MINUTES")
+        .ok()
+        .and_then(|v| v.parse::<u64>().ok())
+}
+
 /// Placeholder token prefixes for technical content preservation
 pub const PLACEHOLDER_PREFIX: &str = "__PB_";
 pub const PLACEHOLDER_CODE_BLOCK_PREFIX: &str = "__PB_CODE_BLOCK_";
@@ -81,6 +87,7 @@ mode = "preview"
 auto_copy_clipboard = true
 preserve_technical_terms = true
 request_timeout_seconds = 60
+keep_alive_interval_minutes = 60
 
 [providers.ollama]
 type = "ollama"

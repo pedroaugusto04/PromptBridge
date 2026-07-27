@@ -20,13 +20,14 @@ pub trait LlmProvider: Send + Sync {
 pub struct ProviderFactory;
 
 impl ProviderFactory {
-    pub fn create(config: &ProviderConfig) -> Result<Box<dyn LlmProvider>> {
+    pub fn create(config: &ProviderConfig, keep_alive_minutes: Option<u64>) -> Result<Box<dyn LlmProvider>> {
         match config.provider_type.as_str() {
             "ollama" => Ok(Box::new(ollama::OllamaProvider::new(
                 config.base_url.clone(),
                 config.model.clone(),
                 config.temperature,
                 config.api_key.clone(),
+                keep_alive_minutes,
             )?)),
             "openai" | "openai-compatible" => Ok(Box::new(openai::OpenAiProvider::new(
                 config.base_url.clone(),
