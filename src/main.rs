@@ -210,11 +210,11 @@ if [ $EXIT_CODE -eq 0 ] && [ -n "$RESULT" ]; then
         echo -n "$RESULT" | xclip -selection clipboard
         log "Auto-copied to clipboard"
         
-        # Show smooth success notification with fade effect
-        (zenity --notification --window-icon="info" --text="✓ Translated & copied!" &
-        ZEN_NOTIFY_PID=$!
+        # Show smooth success notification with PromptBridge app name
+        (notify-send --app-name="PromptBridge" --icon="info" "Translation" "✓ Translated & copied!" &
+        NOTIFY_PID=$!
         sleep 1.5
-        kill $ZEN_NOTIFY_PID 2>/dev/null) &
+        kill $NOTIFY_PID 2>/dev/null) &
     else
         # Manual mode: show modal with Copy / Done buttons
         zenity --text-info \
