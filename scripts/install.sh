@@ -143,6 +143,6 @@ if [ "$NEED_SOURCE" = true ]; then
 else
     echo "   1. Restart your terminal"
 fi
-echo "   2. Verify installation: promptbridge --version"
-echo "   3. Configure keyboard shortcut: promptbridge install-shortcut"
+echo "   2. Run: promptbridge init-config"
+echo "   3. Run: promptbridge install-shortcut"
 echo ""
