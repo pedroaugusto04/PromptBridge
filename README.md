@@ -136,32 +136,75 @@ temperature = 0.2
 <details>
 <summary>Click to expand manual installation options</summary>
 
+### Linux
+
 **Option 1: Using Cargo (requires Rust)**
 ```bash
+# Install Rust if needed
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+
+# Install PromptBridge
 cargo install promptbridge
 ```
 
-**Option 2: Download Pre-compiled Binaries**
-Choose your platform and download the latest release:
-- [Linux x86_64](https://github.com/pedroaugusto04/PromptBridge/releases/latest/download/promptbridge-x86_64-unknown-linux-gnu.tar.gz)
-- [Linux ARM64](https://github.com/pedroaugusto04/PromptBridge/releases/latest/download/promptbridge-aarch64-unknown-linux-gnu.tar.gz)
-- [Windows x86_64](https://github.com/pedroaugusto04/PromptBridge/releases/latest/download/promptbridge-x86_64-pc-windows-msvc.zip)
-- [macOS Apple Silicon](https://github.com/pedroaugusto04/PromptBridge/releases/latest/download/promptbridge-aarch64-apple-darwin.tar.gz)
-- [macOS Intel](https://github.com/pedroaugusto04/PromptBridge/releases/latest/download/promptbridge-x86_64-apple-darwin.tar.gz)
-
-Extract and move to your PATH:
+**Option 2: Download Pre-compiled Binary**
 ```bash
-# Linux/macOS
-tar -xzf promptbridge-*.tar.gz
-sudo mv promptbridge /usr/local/bin/
+# Download the latest release
+wget https://github.com/pedroaugusto04/PromptBridge/releases/latest/download/promptbridge-x86_64-unknown-linux-gnu.tar.gz
 
-# Windows
+# Extract and install
+tar -xzf promptbridge-x86_64-unknown-linux-gnu.tar.gz
+sudo mv promptbridge /usr/local/bin/
+```
+
+**Install Dependencies:**
+```bash
+sudo apt install xclip xdotool zenity -y
+```
+
+### Windows
+
+**Option 1: Using Cargo (requires Rust)**
+```powershell
+# Install Rust if needed
+Invoke-WebRequest -Uri https://win.rustup.rs/x86_64 -OutFile rustup-init.exe
+.\rustup-init.exe
+
+# Install PromptBridge
+cargo install promptbridge
+```
+
+**Option 2: Download Pre-compiled Binary**
+```powershell
+# Download the latest release
+Invoke-WebRequest -Uri "https://github.com/pedroaugusto04/PromptBridge/releases/latest/download/promptbridge-x86_64-pc-windows-msvc.zip" -OutFile promptbridge.zip
+
+# Extract and add to PATH
 Expand-Archive -Path promptbridge.zip -DestinationPath $env:USERPROFILE\.cargo\bin
 ```
 
-**Linux Dependencies (required for all installation methods):**
+### macOS
+
+**Option 1: Using Cargo (requires Rust)**
 ```bash
-sudo apt install xclip xdotool zenity -y
+# Install Rust if needed
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+
+# Install PromptBridge
+cargo install promptbridge
+```
+
+**Option 2: Download Pre-compiled Binary**
+```bash
+# For Apple Silicon (M1/M2/M3)
+wget https://github.com/pedroaugusto04/PromptBridge/releases/latest/download/promptbridge-aarch64-apple-darwin.tar.gz
+
+# For Intel Macs
+wget https://github.com/pedroaugusto04/PromptBridge/releases/latest/download/promptbridge-x86_64-apple-darwin.tar.gz
+
+# Extract and install
+tar -xzf promptbridge-*.tar.gz
+sudo mv promptbridge /usr/local/bin/
 ```
 
 </details>
