@@ -3,8 +3,17 @@ set -e
 
 # PromptBridge Installation Script for Linux/macOS
 # This script downloads the latest binary and sets up configuration
+#
+# Quick Install:
+#   curl -sSL https://raw.githubusercontent.com/pedroaugusto04/PromptBridge/main/scripts/install.sh | sh
+#
+# This script will:
+#   1. Download the latest PromptBridge binary
+#   2. Install it to your PATH
+#   3. Run interactive configuration (init-config)
+#   4. Install keyboard shortcut helper (install-shortcut)
 
-echo "Installing PromptBridge..."
+echo "=== PromptBridge Installation for Linux/macOS ==="
 
 # Detect platform and architecture
 OS=$(uname -s)
@@ -139,13 +148,36 @@ case ":$PATH:" in *":$INSTALL_DIR:"*) ;;
 esac
 
 echo ""
-echo "PromptBridge installed successfully!"
+echo "Running interactive configuration..."
+"$INSTALL_DIR/promptbridge" init-config
+
 echo ""
-echo "Next steps:"
-echo "   1. Run: promptbridge init-config"
-echo "   2. Run: promptbridge install-shortcut"
+echo "Installing keyboard shortcut helper..."
+"$INSTALL_DIR/promptbridge" install-shortcut
+
+echo ""
+echo "=== Installation Complete ==="
+echo ""
 if [ "$NEED_SOURCE" = true ]; then
+    echo "IMPORTANT: You MUST restart your terminal for PATH changes to take effect."
     echo ""
-    echo "Note: PATH added to $CONFIG_FILE. Restart your terminal for permanent changes."
+fi
+echo "After restarting, verify installation:"
+echo "   promptbridge --version"
+echo ""
+echo "Your configuration is already set up! The script ran:"
+echo "   ✓ promptbridge init-config (interactive configuration)"
+echo "   ✓ promptbridge install-shortcut (keyboard shortcut helper)"
+echo ""
+echo "To configure your global hotkey:"
+if [ "$OS" = "Darwin" ]; then
+    echo "   1. Open Automator → Quick Action"
+    echo "   2. Add 'Run Shell Script' with: pb-translate \"\$@\""
+    echo "   3. Set keyboard shortcut in System Settings → Keyboard → Keyboard Shortcuts → Services"
+else
+    echo "   1. Open Settings → Keyboard → Keyboard Shortcuts → Custom Shortcuts (+)"
+    echo "   2. Name: PromptBridge Translate"
+    echo "   3. Command: pb-translate"
+    echo "   4. Shortcut: Set your preferred key combination (e.g., Ctrl+Alt+T)"
 fi
 echo ""

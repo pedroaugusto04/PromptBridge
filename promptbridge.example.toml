@@ -4,7 +4,7 @@
 # Default provider to use: "google_translate", "ollama", "openai", or "mock"
 default_provider = "google_translate"
 
-# Target language for prompt translation (e.g., "en", "es", "fr")
+# Target language for prompt translation (e.g., "en", "es", "fr", "zh", "zh-cn")
 target_language = "en"
 
 # Display mode for CLI Proxy Gateway ("preview" or "silent")

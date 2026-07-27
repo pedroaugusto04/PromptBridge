@@ -1,7 +1,17 @@
 # PromptBridge Installation Script for Windows
 # This script downloads the latest binary and sets up configuration
+# 
+# Quick Install:
+#   irm https://raw.githubusercontent.com/pedroaugusto04/PromptBridge/main/scripts/install.ps1 | iex
+#
+# This script will:
+#   1. Download the latest PromptBridge binary
+#   2. Install it to your PATH
+#   3. Run interactive configuration (init-config)
+#   4. Install keyboard shortcut helper (install-shortcut)
 
-Write-Host "Installing PromptBridge..." -ForegroundColor Green
+Write-Host "=== PromptBridge Installation for Windows ===" -ForegroundColor Green
+Write-Host ""
 
 # Detect architecture
 $arch = if ([Environment]::Is64BitOperatingSystem) { "x86_64" } else { "i686" }
@@ -88,13 +98,36 @@ try {
         Write-Host "   PATH updated. You may need to restart your terminal." -ForegroundColor Green
     }
 
+    # Run interactive configuration
     Write-Host ""
-    Write-Host "PromptBridge installed successfully!" -ForegroundColor Green
+    Write-Host "Running interactive configuration..." -ForegroundColor Cyan
+    $promptbridgePath = Join-Path $installDir "promptbridge.exe"
+    & $promptbridgePath init-config
+
+    # Install keyboard shortcut
     Write-Host ""
-    Write-Host "Next steps:" -ForegroundColor Cyan
-    Write-Host "   1. Restart your terminal or refresh your PATH"
-    Write-Host "   2. Verify installation: promptbridge --version"
-    Write-Host "   3. Configure keyboard shortcut: promptbridge install-shortcut"
+    Write-Host "Installing keyboard shortcut..." -ForegroundColor Cyan
+    & $promptbridgePath install-shortcut
+
+    Write-Host ""
+    Write-Host "=== Installation Complete ===" -ForegroundColor Green
+    Write-Host ""
+    Write-Host "IMPORTANT: You MUST restart your terminal for PATH changes to take effect." -ForegroundColor Yellow
+    Write-Host ""
+    Write-Host "After restarting, verify installation:" -ForegroundColor Cyan
+    Write-Host "   promptbridge --version"
+    Write-Host ""
+    Write-Host "Your configuration is already set up! The script ran:" -ForegroundColor Green
+    Write-Host "   ✓ promptbridge init-config (interactive configuration)"
+    Write-Host "   ✓ promptbridge install-shortcut (keyboard shortcut helper)"
+    Write-Host ""
+    Write-Host "To configure your global hotkey:" -ForegroundColor Cyan
+    Write-Host "   1. Install AutoHotkey: https://www.autohotkey.com/"
+    Write-Host "   2. Create an .ahk script with:"
+    Write-Host "      ^t::  ; Ctrl+T"
+    Write-Host "      Run, PowerShell.exe -ExecutionPolicy Bypass -File `"%APPDATA%\promptbridge\pb-translate.ps1`""
+    Write-Host "      return"
+    Write-Host "   3. Run the AutoHotkey script"
     Write-Host ""
 
 } finally {

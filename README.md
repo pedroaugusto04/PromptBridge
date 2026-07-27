@@ -39,7 +39,8 @@ This interactive wizard will guide you through:
 - Setting your target language
 - Configuring keep-alive interval
 
-**Note:** Google Translate is the default provider and requires no configuration - it's free and works out of the box.
+> [!TIP]
+> Google Translate is the default provider and requires no configuration - it's free and works out of the box.
 
 **2. Install the keyboard shortcut helper:**
 ```bash
@@ -108,7 +109,7 @@ nano ~/Library/Application\ Support/promptbridge/promptbridge.toml
 # The active provider to use ("google_translate", "ollama", "openai", or "mock")
 default_provider = "google_translate"
 
-# Target language for translation (e.g., "en", "es", "fr", "pt")
+# Target language for translation (e.g., "en", "es", "fr", "pt", "zh", "zh-cn")
 target_language = "en"
 
 # Timeout for requests in seconds (increase if model is slow to start/respond)
