@@ -1,8 +1,8 @@
 # PromptBridge Configuration Example
 
 [general]
-# Default provider to use: "ollama", "openai", or "mock"
-default_provider = "ollama"
+# Default provider to use: "google_translate", "ollama", "openai", or "mock"
+default_provider = "google_translate"
 
 # Target language for prompt translation (e.g., "en", "es", "fr")
 target_language = "en"
@@ -17,6 +17,14 @@ auto_copy_clipboard = false
 
 # Enable strict preservation of technical terms (code blocks, paths, logs, commands)
 preserve_technical_terms = true
+
+# Keep Ollama model loaded in memory for this many minutes (prevents cold starts)
+# Set to 0 to disable, or increase for longer keep-alive periods
+keep_alive_interval_minutes = 60
+
+[providers.google_translate]
+type = "google_translate"
+# Free Google Translate API - no configuration required
 
 [providers.ollama]
 type = "ollama"

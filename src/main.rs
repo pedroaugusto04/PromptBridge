@@ -1,15 +1,16 @@
 use clap::Parser;
 use promptbridge::cli::{Cli, Commands, ConfigSubcommand};
-use promptbridge::config::Config;
+use promptbridge::config::{Config, ProviderConfig};
 use promptbridge::engine::{TransformMode, TransformationPipeline};
 use promptbridge::exec::ExecGateway;
 use promptbridge::messages::{
-    format_provider_list_item, MSG_INPUT_PROMPT_EMPTY, MSG_PROMPT_COPIED_CLIPBOARD,
+    format_provider_list_item, MSG_INPUT_PROMPT_EMPTY,
 };
+use promptbridge::platform::{get_platform, get_platform_dialog, get_platform_notifier};
 use promptbridge::providers::{LlmProvider, ProviderFactory};
 use promptbridge::utils::clipboard::copy_to_clipboard;
 use promptbridge::utils::error::{PromptBridgeError, Result};
-use promptbridge::utils::formatting::{format_diff, print_error, print_success};
+use promptbridge::utils::formatting::{format_diff, print_error};
 use std::io::{self, Read};
 
 #[tokio::main]
@@ -20,7 +21,14 @@ async fn main() {
     let cli = Cli::parse();
 
     if let Err(err) = run_app(cli).await {
-        print_error(&err.user_facing_message());
+        let platform = get_platform_dialog();
+        let error_msg = err.user_facing_message();
+        
+        // Try to show error in modal, fall back to stderr
+        if let Err(_) = platform.show_error("PromptBridge Error", &error_msg) {
+            print_error(&error_msg);
+        }
+        
         std::process::exit(1);
     }
 }
@@ -130,73 +138,23 @@ async fn run_app(cli: Cli) -> Result<()> {
         Commands::InstallShortcut => {
             install_shortcut()?;
         }
+
+        Commands::InitConfig => {
+            init_config_interactive()?;
+        }
     }
 
     Ok(())
 }
 
 fn install_shortcut() -> Result<()> {
-    // 1. Create default config file if it does not exist
-    if let Some(mut user_config_dir) = dirs::config_dir() {
-        user_config_dir.push("promptbridge");
-        std::fs::create_dir_all(&user_config_dir)?;
-        let config_file = user_config_dir.join("promptbridge.toml");
-        if !config_file.exists() {
-            std::fs::write(&config_file, promptbridge::constants::DEFAULT_CONFIG_TOML)?;
-            println!("✓ Created global config template at: {}", config_file.display());
-        }
-    }
-
-    // 2. Create the shortcut script in ~/.local/bin/pb-translate
-    if let Some(home_dir) = dirs::home_dir() {
-        let bin_dir = home_dir.join(".local").join("bin");
-        std::fs::create_dir_all(&bin_dir)?;
-        let script_path = bin_dir.join("pb-translate");
-        
-        let script_content = r#"#!/bin/bash
-# 1. Clear clipboard to detect if text was actually selected
-OLD_CLIP=$(xclip -selection clipboard -o 2>/dev/null)
-xclip -selection clipboard /dev/null
-
-# 2. Copy selected text
-xdotool key ctrl+c
-sleep 0.1
-
-# 3. Get text from clipboard
-TEXTO=$(xclip -selection clipboard -o 2>/dev/null)
-
-# If nothing was copied, restore old clipboard and exit gracefully
-if [ -z "$TEXTO" ]; then
-    echo -n "$OLD_CLIP" | xclip -selection clipboard
-    exit 0
-fi
-
-# 4. Translate via PromptBridge (copies result automatically)
-promptbridge --copy translate "$TEXTO"
-
-# 5. Paste translated text
-xdotool key ctrl+v
-"#;
-
-        std::fs::write(&script_path, script_content)?;
-        
-        #[cfg(unix)]
-        {
-            use std::os::unix::fs::PermissionsExt;
-            let mut perms = std::fs::metadata(&script_path)?.permissions();
-            perms.set_mode(0o755);
-            std::fs::set_permissions(&script_path, perms)?;
-        }
-        
-        println!("✓ Created helper script at: {}", script_path.display());
-        println!("\n=== Installation complete ===");
-        println!("Please configure the keyboard shortcut in your OS Settings:");
-        println!("  Shortcut Command: pb-translate");
-        println!("  Example Shortcut Keys: Ctrl+Alt+T");
-    } else {
-        return Err(PromptBridgeError::Engine("Could not locate home directory".to_string()));
-    }
-
+    let platform = get_platform();
+    let result = platform.install_shortcut()?;
+    
+    println!("✓ Created helper script at: {}", result.script_path);
+    println!("\n=== Installation complete ===");
+    println!("{}", result.config_instructions);
+    
     Ok(())
 }
 
@@ -217,6 +175,10 @@ async fn process_single_prompt(
         return Err(PromptBridgeError::Engine(MSG_INPUT_PROMPT_EMPTY.to_string()));
     }
 
+    // Show loading notification
+    let notifier = get_platform_notifier();
+    let _ = notifier.show_notification("PromptBridge", "Translating...");
+
     let provider_name = override_provider
         .as_deref()
         .unwrap_or(&config.general.default_provider);
@@ -228,7 +190,7 @@ async fn process_single_prompt(
     let provider: Box<dyn LlmProvider> = if dry_run {
         Box::new(promptbridge::providers::mock::MockProvider::new(None))
     } else {
-        ProviderFactory::create(provider_config)?
+        ProviderFactory::create(provider_config, config.general.keep_alive_interval_minutes)?
     };
 
     let result = TransformationPipeline::execute(
@@ -247,9 +209,202 @@ async fn process_single_prompt(
 
     if copy || config.general.auto_copy_clipboard {
         copy_to_clipboard(&result.final_prompt)?;
-        print_success(MSG_PROMPT_COPIED_CLIPBOARD);
+        let _ = notifier.show_notification("PromptBridge", "Translation copied to clipboard");
+    } else {
+        let _ = notifier.show_notification("PromptBridge", "Translation completed");
     }
 
+    Ok(())
+}
+
+fn init_config_interactive() -> Result<()> {
+    use dialoguer::{Select, Input, Confirm};
+    
+    println!("PromptBridge Interactive Configuration\n");
+    
+    // Get config directory
+    let config_dir = dirs::config_dir()
+        .ok_or_else(|| PromptBridgeError::Config("Could not determine config directory".to_string()))?
+        .join("promptbridge");
+    
+    std::fs::create_dir_all(&config_dir)?;
+    let config_path = config_dir.join("promptbridge.toml");
+    
+    // Load existing config or create default
+    let mut config = if config_path.exists() {
+        let content = std::fs::read_to_string(&config_path)?;
+        toml::from_str::<Config>(&content).map_err(|e| PromptBridgeError::Config(e.to_string()))?
+    } else {
+        Config::load(None)?
+    };
+    
+    // Select provider
+    let providers = vec!["google_translate", "ollama", "openai", "mock"];
+    let selection = Select::new()
+        .with_prompt("Select your translation provider")
+        .items(&providers)
+        .default(0)
+        .interact()
+        .map_err(|e| PromptBridgeError::Config(format!("Interactive prompt failed: {}", e)))?;
+    
+    let selected_provider = providers[selection];
+    config.general.default_provider = selected_provider.to_string();
+    
+    // Provider-specific configuration
+    match selected_provider {
+        "google_translate" => {
+            let provider_config = ProviderConfig {
+                provider_type: "google_translate".to_string(),
+                base_url: None,
+                api_key: None,
+                model: None,
+                temperature: None,
+            };
+
+            config.providers.insert("google_translate".to_string(), provider_config);
+        }
+
+        "ollama" => {
+            let base_url: String = Input::new()
+                .with_prompt("Ollama base URL (default: http://localhost:11434)")
+                .allow_empty(true)
+                .interact()
+                .map_err(|e| PromptBridgeError::Config(format!("Interactive prompt failed: {}", e)))?;
+            let base_url = if base_url.is_empty() {
+                "http://localhost:11434".to_string()
+            } else {
+                base_url
+            };
+
+            let model: String = Input::new()
+                .with_prompt("Model name (default: llama3.2)")
+                .allow_empty(true)
+                .interact()
+                .map_err(|e| PromptBridgeError::Config(format!("Interactive prompt failed: {}", e)))?;
+            let model = if model.is_empty() {
+                "llama3.2".to_string()
+            } else {
+                model
+            };
+            
+            let use_auth = Confirm::new()
+                .with_prompt("Does your Ollama instance require authentication?")
+                .default(false)
+                .interact()
+                .map_err(|e| PromptBridgeError::Config(format!("Interactive prompt failed: {}", e)))?;
+            
+            let api_key = if use_auth {
+                Some(Input::new()
+                    .with_prompt("API key / Bearer token")
+                    .interact()
+                    .map_err(|e| PromptBridgeError::Config(format!("Interactive prompt failed: {}", e)))?)
+            } else {
+                None
+            };
+            
+            let provider_config = ProviderConfig {
+                provider_type: "ollama".to_string(),
+                base_url: Some(base_url),
+                api_key,
+                model: Some(model),
+                temperature: Some(0.0),
+            };
+            
+            config.providers.insert("ollama".to_string(), provider_config);
+        }
+        
+        "openai" => {
+            let base_url: String = Input::new()
+                .with_prompt("OpenAI API base URL (default: https://api.openai.com/v1)")
+                .allow_empty(true)
+                .interact()
+                .map_err(|e| PromptBridgeError::Config(format!("Interactive prompt failed: {}", e)))?;
+            let base_url = if base_url.is_empty() {
+                "https://api.openai.com/v1".to_string()
+            } else {
+                base_url
+            };
+
+            let api_key: String = Input::new()
+                .with_prompt("API key")
+                .allow_empty(true)
+                .interact()
+                .map_err(|e| PromptBridgeError::Config(format!("Interactive prompt failed: {}", e)))?;
+
+            let model: String = Input::new()
+                .with_prompt("Model name (default: gpt-4o-mini)")
+                .allow_empty(true)
+                .interact()
+                .map_err(|e| PromptBridgeError::Config(format!("Interactive prompt failed: {}", e)))?;
+            let model = if model.is_empty() {
+                "gpt-4o-mini".to_string()
+            } else {
+                model
+            };
+            
+            let provider_config = ProviderConfig {
+                provider_type: "openai".to_string(),
+                base_url: Some(base_url),
+                api_key: Some(api_key),
+                model: Some(model),
+                temperature: Some(0.0),
+            };
+            
+            config.providers.insert("openai".to_string(), provider_config);
+        }
+        
+        "mock" => {
+            let provider_config = ProviderConfig {
+                provider_type: "mock".to_string(),
+                base_url: None,
+                api_key: None,
+                model: None,
+                temperature: Some(0.0),
+            };
+            
+            config.providers.insert("mock".to_string(), provider_config);
+        }
+        
+        _ => unreachable!(),
+    }
+    
+    // Target language
+    let target_lang: String = Input::new()
+        .with_prompt("Target language for translation (default: en)")
+        .allow_empty(true)
+        .interact()
+        .map_err(|e| PromptBridgeError::Config(format!("Interactive prompt failed: {}", e)))?;
+    let target_lang = if target_lang.is_empty() {
+        "en".to_string()
+    } else {
+        target_lang
+    };
+
+    config.general.target_language = target_lang;
+
+    // Keep-alive interval
+    let keep_alive: String = Input::new()
+        .with_prompt("Keep-alive interval in minutes (0 to disable, default: 60)")
+        .allow_empty(true)
+        .interact()
+        .map_err(|e| PromptBridgeError::Config(format!("Interactive prompt failed: {}", e)))?;
+    let keep_alive = if keep_alive.is_empty() {
+        "60".to_string()
+    } else {
+        keep_alive
+    };
+    
+    config.general.keep_alive_interval_minutes = Some(keep_alive.parse::<u64>().unwrap_or(60));
+    
+    // Save configuration
+    let toml_str = toml::to_string_pretty(&config)
+        .map_err(|e| PromptBridgeError::Config(e.to_string()))?;
+    
+    std::fs::write(&config_path, toml_str)?;
+    
+    println!("\nConfiguration saved to: {}", config_path.display());
+    println!("You can edit this file manually if needed.");
+    
     Ok(())
 }
 

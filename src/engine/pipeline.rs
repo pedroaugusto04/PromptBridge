@@ -23,10 +23,23 @@ impl TransformationPipeline {
         target_language: &str,
     ) -> Result<PipelineResult> {
         // 1. Sanitize & extract technical elements
-        let (sanitized_text, extracted_items) = TechnicalParser::extract(input);
+        let (sanitized_text, extracted_items) = TechnicalParser::extract(input)?;
 
         // 2. Build system prompt
         let system_prompt = TemplateEngine::get_system_prompt(mode, target_language);
+        
+        // Only include placeholder instructions if there are actually placeholders
+        let system_prompt = if extracted_items.is_empty() {
+            // Simplified system prompt without placeholder instructions
+            format!(
+                "You are PromptBridge, an expert AI prompt engineering system.\n\n\
+                 TASK: Translate the natural language text into clean, professional '{}'.\n\
+                 Output Format: Return ONLY the transformed prompt text. Do NOT include markdown code blocks around the entire output, meta commentary, or greetings.",
+                target_language
+            )
+        } else {
+            system_prompt
+        };
 
         // 3. Prepare completion request
         let request = CompletionRequest {
@@ -44,7 +57,7 @@ impl TransformationPipeline {
         let raw_llm_response = response.content.trim().to_string();
 
         // 5. Restore technical elements
-        let final_prompt = TechnicalParser::restore(&raw_llm_response, &extracted_items);
+        let final_prompt = TechnicalParser::restore(&raw_llm_response, &extracted_items)?;
 
         Ok(PipelineResult {
             original_text: input.to_string(),

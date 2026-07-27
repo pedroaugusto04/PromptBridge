@@ -5,8 +5,8 @@ use std::path::PathBuf;
 #[command(
     name = "promptbridge",
     author = "PromptBridge Contributors",
-    version = "0.1.0",
-    about = "CLI-agnostic prompt gateway: translates and optimizes developer prompts while preserving technical content."
+    version = "0.3.3",
+    about = "A quick CLI tool that translates coding prompts via global hotkey. Translated text is automatically copied to clipboard."
 )]
 pub struct Cli {
     /// Custom configuration file path
@@ -77,6 +77,9 @@ pub enum Commands {
         #[command(subcommand)]
         action: Option<ConfigSubcommand>,
     },
+
+    /// Initialize configuration interactively
+    InitConfig,
 
     /// List configured LLM providers
     Providers,

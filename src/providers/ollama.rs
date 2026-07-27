@@ -12,6 +12,7 @@ pub struct OllamaProvider {
     model: String,
     temperature: f32,
     auth_token: Option<String>,
+    keep_alive: Option<String>,
 }
 
 impl OllamaProvider {
@@ -20,11 +21,14 @@ impl OllamaProvider {
         model: Option<String>,
         temperature: Option<f32>,
         auth_token: Option<String>,
+        keep_alive_minutes: Option<u64>,
     ) -> Result<Self> {
         let base_url = base_url.unwrap_or_else(get_ollama_base_url);
         let model = model.unwrap_or_else(get_ollama_model);
         let temperature = temperature.unwrap_or_else(get_temperature);
         let timeout = get_request_timeout();
+
+        let keep_alive = keep_alive_minutes.map(|mins| format!("{}m", mins));
 
         let client = Client::builder()
             .timeout(timeout)
@@ -40,6 +44,7 @@ impl OllamaProvider {
             model,
             temperature,
             auth_token,
+            keep_alive,
         })
     }
 }
@@ -61,6 +66,7 @@ struct OllamaMessagePayload {
 #[derive(Serialize)]
 struct OllamaOptionsPayload {
     temperature: f32,
+    keep_alive: Option<String>,
 }
 
 #[derive(Deserialize)]
@@ -101,6 +107,7 @@ impl LlmProvider for OllamaProvider {
             stream: false,
             options: OllamaOptionsPayload {
                 temperature: request.temperature.unwrap_or(self.temperature),
+                keep_alive: self.keep_alive.clone(),
             },
         };
 

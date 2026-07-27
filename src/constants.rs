@@ -9,6 +9,11 @@ pub const ENV_PREFIX: &str = "PROMPTBRIDGE_";
 pub const DEFAULT_OLLAMA_MODEL: &str = "llama3.2";
 pub const DEFAULT_TARGET_LANGUAGE: &str = "en";
 
+/// Security limits to prevent resource exhaustion
+pub const MAX_PROMPT_SIZE_BYTES: usize = 100_000; // 100KB
+pub const MAX_RESPONSE_SIZE_BYTES: usize = 10_000; // 10KB
+pub const MAX_EXTRACTED_ITEMS: usize = 1000; // Prevent excessive extraction
+
 /// Dynamic getters with Environment Variable overrides & fallback defaults
 
 pub fn get_ollama_base_url() -> String {
@@ -56,6 +61,12 @@ pub fn get_request_timeout() -> Duration {
     Duration::from_secs(secs)
 }
 
+pub fn get_keep_alive_interval_minutes() -> Option<u64> {
+    std::env::var("PROMPTBRIDGE_KEEP_ALIVE_INTERVAL_MINUTES")
+        .ok()
+        .and_then(|v| v.parse::<u64>().ok())
+}
+
 /// Placeholder token prefixes for technical content preservation
 pub const PLACEHOLDER_PREFIX: &str = "__PB_";
 pub const PLACEHOLDER_CODE_BLOCK_PREFIX: &str = "__PB_CODE_BLOCK_";
@@ -70,37 +81,31 @@ pub const REGEX_FILE_PATH: &str = r#"(?i)\b(?:[a-z]:\\|/|\./|\.\./|[a-z0-9_.-]+/
 /// Default configuration template
 pub const DEFAULT_CONFIG_TOML: &str = r#"
 [general]
-default_provider = "ollama"
+default_provider = "google_translate"
 target_language = "en"
 mode = "preview"
-auto_copy_clipboard = false
+auto_copy_clipboard = true
 preserve_technical_terms = true
 request_timeout_seconds = 60
+keep_alive_interval_minutes = 60
+
+[providers.google_translate]
+type = "google_translate"
 
 [providers.ollama]
 type = "ollama"
 base_url = "http://localhost:11434"
 model = "llama3.2"
-temperature = 0.2
+temperature = 0.0
 
 [providers.openai]
 type = "openai"
 base_url = "https://api.openai.com/v1"
 api_key = "env:OPENAI_API_KEY"
 model = "gpt-4o-mini"
-temperature = 0.2
+temperature = 0.0
 
 [providers.mock]
 type = "mock"
 temperature = 0.0
 "#;
-
-/// Base system prompt instructions
-pub const SYSTEM_PROMPT_BASE_INSTRUCTIONS: &str = concat!(
-    "You are PromptBridge, an expert AI prompt engineering system.\n",
-    "STRICT RULES:\n",
-    "1. Preserved Tokens: All placeholders formatted like `__PB_CODE_BLOCK_X__`, `__PB_CODE_INLINE_X__`, `__PB_PATH_X__` MUST BE PRESERVED EXACTLY AS WRITTEN. Do not alter, translate, remove, or modify them.\n",
-    "2. Technical Terms: Do NOT translate programming languages, framework names (e.g., Tokio, React, Serde, Cargo), library functions, API routes, or CLI flags.\n",
-    "3. Output Format: Return ONLY the transformed prompt text. Do NOT include markdown code blocks around the entire output, meta commentary, or greetings.\n",
-    "4. Target Language: The natural language portion of the prompt must be in '{target_language}'."
-);

@@ -40,7 +40,7 @@ impl ExecGateway {
         let provider: Box<dyn LlmProvider> = if dry_run {
             Box::new(crate::providers::mock::MockProvider::new(None))
         } else {
-            ProviderFactory::create(provider_config)?
+            ProviderFactory::create(provider_config, config.general.keep_alive_interval_minutes)?
         };
 
         // Inspect argv positional arguments to see if a raw prompt argument was passed

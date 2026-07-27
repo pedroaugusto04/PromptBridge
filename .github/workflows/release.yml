@@ -5,6 +5,9 @@ on:
     tags:
       - 'v*'
 
+permissions:
+  contents: write
+
 jobs:
   build-release:
     name: Build (${{ matrix.target }})
@@ -26,6 +29,11 @@ jobs:
             target: aarch64-apple-darwin
             artifact_name: promptbridge-macos-arm64
             asset_name: promptbridge-aarch64-apple-darwin.tar.gz
+
+          - os: macos-latest
+            target: x86_64-apple-darwin
+            artifact_name: promptbridge-macos-amd64
+            asset_name: promptbridge-x86_64-apple-darwin.tar.gz
 
     steps:
       - name: Checkout repository

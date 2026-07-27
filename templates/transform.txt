@@ -1,0 +1,4 @@
+{base_instructions}
+
+TASK: Both TRANSLATE natural language to '{target_language}' AND OPTIMIZE the instruction structure for AI Coding Agents.
+Make the prompt explicit, highly actionable, structured, and easy for an automated developer agent to execute directly.
