@@ -21,8 +21,8 @@ try {
         }
     } catch {
         Write-Host "Warning: Could not fetch latest version from GitHub API (rate limited)" -ForegroundColor Yellow
-        Write-Host "Using fallback version: v0.3.0" -ForegroundColor Yellow
-        $latestVersion = "v0.3.0"
+        Write-Host "Using fallback version: v0.3.1" -ForegroundColor Yellow
+        $latestVersion = "v0.3.1"
     }
     Write-Host "Latest version: $latestVersion" -ForegroundColor Green
 
