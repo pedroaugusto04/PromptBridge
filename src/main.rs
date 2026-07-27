@@ -239,9 +239,9 @@ fn init_config_interactive() -> Result<()> {
     };
     
     // Select provider
-    let providers = vec!["ollama", "openai", "mock"];
+    let providers = vec!["google_translate", "ollama", "openai", "mock"];
     let selection = Select::new()
-        .with_prompt("Select your LLM provider")
+        .with_prompt("Select your translation provider")
         .items(&providers)
         .default(0)
         .interact()
@@ -252,6 +252,18 @@ fn init_config_interactive() -> Result<()> {
     
     // Provider-specific configuration
     match selected_provider {
+        "google_translate" => {
+            let provider_config = ProviderConfig {
+                provider_type: "google_translate".to_string(),
+                base_url: None,
+                api_key: None,
+                model: None,
+                temperature: None,
+            };
+
+            config.providers.insert("google_translate".to_string(), provider_config);
+        }
+
         "ollama" => {
             let base_url: String = Input::new()
                 .with_prompt("Ollama base URL (default: http://localhost:11434)")
