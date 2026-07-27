@@ -60,6 +60,9 @@ return
 
 ### Manual Installation
 
+<details>
+<summary>Click to expand manual installation options</summary>
+
 If you prefer manual installation or need Rust-specific installation:
 
 **Using Cargo:**
@@ -78,6 +81,8 @@ cargo install promptbridge
 ```bash
 sudo apt install xclip xdotool zenity -y
 ```
+
+</details>
 
 ---
 
