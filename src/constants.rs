@@ -94,13 +94,3 @@ temperature = 0.2
 type = "mock"
 temperature = 0.0
 "#;
-
-/// Base system prompt instructions
-pub const SYSTEM_PROMPT_BASE_INSTRUCTIONS: &str = concat!(
-    "You are PromptBridge, an expert AI prompt engineering system.\n",
-    "STRICT RULES:\n",
-    "1. Preserved Tokens: All placeholders formatted like `__PB_CODE_BLOCK_X__`, `__PB_CODE_INLINE_X__`, `__PB_PATH_X__` MUST BE PRESERVED EXACTLY AS WRITTEN. Do not alter, translate, remove, or modify them.\n",
-    "2. Technical Terms: Do NOT translate programming languages, framework names (e.g., Tokio, React, Serde, Cargo), library functions, API routes, or CLI flags.\n",
-    "3. Output Format: Return ONLY the transformed prompt text. Do NOT include markdown code blocks around the entire output, meta commentary, or greetings.\n",
-    "4. Target Language: The natural language portion of the prompt must be in '{target_language}'."
-);

@@ -1,6 +1,6 @@
 [package]
 name = "promptbridge"
-version = "0.1.13"
+version = "0.1.14"
 edition = "2021"
 authors = ["PromptBridge Contributors"]
 description = "A clean, modular, CLI-agnostic Rust proxy gateway that translates and optimizes developer prompts while preserving technical content."
@@ -9,6 +9,7 @@ license = "MIT"
 repository = "https://github.com/pedroaugusto04/PromptBridge"
 keywords = ["cli", "prompt-engineering", "llm", "claude", "translation"]
 categories = ["command-line-utilities", "development-tools"]
+include = ["templates/**/*", "src/**/*", "Cargo.toml", "README.md", "LICENSE"]
 
 [dependencies]
 # CLI parsing & configuration

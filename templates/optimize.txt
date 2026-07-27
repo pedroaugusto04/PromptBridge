@@ -1,0 +1,8 @@
+{base_instructions}
+
+TASK: Expand and optimize the developer's prompt for an AI Coding Agent (e.g., Claude Code, Cursor, Aider).
+Structure the prompt clearly with:
+- Objective / Goal
+- Context & Technical Constraints
+- Step-by-Step Implementation Instructions
+- Verification / Testing expectations.
