@@ -241,13 +241,13 @@ fn init_config_interactive() -> Result<()> {
         "ollama" => {
             let base_url = Input::new()
                 .with_prompt("Ollama base URL")
-                .with_initial_text("http://localhost:11434")
+                .default("http://localhost:11434".to_string())
                 .interact()
                 .map_err(|e| PromptBridgeError::Config(format!("Interactive prompt failed: {}", e)))?;
 
             let model = Input::new()
                 .with_prompt("Model name")
-                .with_initial_text("llama3.2")
+                .default("llama3.2".to_string())
                 .interact()
                 .map_err(|e| PromptBridgeError::Config(format!("Interactive prompt failed: {}", e)))?;
             
@@ -280,7 +280,7 @@ fn init_config_interactive() -> Result<()> {
         "openai" => {
             let base_url = Input::new()
                 .with_prompt("OpenAI API base URL")
-                .with_initial_text("https://api.openai.com/v1")
+                .default("https://api.openai.com/v1".to_string())
                 .interact()
                 .map_err(|e| PromptBridgeError::Config(format!("Interactive prompt failed: {}", e)))?;
 
@@ -291,7 +291,7 @@ fn init_config_interactive() -> Result<()> {
 
             let model = Input::new()
                 .with_prompt("Model name")
-                .with_initial_text("gpt-4o-mini")
+                .default("gpt-4o-mini".to_string())
                 .interact()
                 .map_err(|e| PromptBridgeError::Config(format!("Interactive prompt failed: {}", e)))?;
             
@@ -324,7 +324,7 @@ fn init_config_interactive() -> Result<()> {
     // Target language
     let target_lang = Input::new()
         .with_prompt("Target language for translation")
-        .with_initial_text("en")
+        .default("en".to_string())
         .interact()
         .map_err(|e| PromptBridgeError::Config(format!("Interactive prompt failed: {}", e)))?;
 
@@ -333,7 +333,7 @@ fn init_config_interactive() -> Result<()> {
     // Keep-alive interval
     let keep_alive: String = Input::new()
         .with_prompt("Keep-alive interval in minutes (0 to disable)")
-        .with_initial_text("60")
+        .default("60".to_string())
         .interact()
         .map_err(|e| PromptBridgeError::Config(format!("Interactive prompt failed: {}", e)))?;
     
