@@ -199,23 +199,40 @@ log "Exit code: $EXIT_CODE | Result: $RESULT"
 kill $ZEN_PID 2>/dev/null
 wait $ZEN_PID 2>/dev/null
 
-# 7. Show result in a modal with Copy / Done
+# 7. Check if auto_copy is enabled in config
+CONFIG_FILE="$HOME/.config/promptbridge/promptbridge.toml"
+AUTO_COPY=$(grep -E "^auto_copy_clipboard\s*=" "$CONFIG_FILE" 2>/dev/null | cut -d= -f2 | tr -d ' "')
+
+# 8. Show result based on auto_copy setting
 if [ $EXIT_CODE -eq 0 ] && [ -n "$RESULT" ]; then
-    zenity --text-info \
-        --title="PromptBridge" \
-        --width=700 --height=500 \
-        --ok-label="Copy" --cancel-label="Done" \
-        --filename=/dev/stdin \
-        <<< "$RESULT"
-    BUTTON_CODE=$?
-    
-    if [ $BUTTON_CODE -eq 0 ]; then
-        # Copy button clicked - copy to clipboard
+    if [ "$AUTO_COPY" = "true" ]; then
+        # Auto-copy mode: copy silently and show smooth success notification
         echo -n "$RESULT" | xclip -selection clipboard
+        log "Auto-copied to clipboard"
+        
+        # Show smooth success notification with fade effect
+        (zenity --notification --window-icon="info" --text="✓ Translated & copied!" &
+        ZEN_NOTIFY_PID=$!
+        sleep 1.5
+        kill $ZEN_NOTIFY_PID 2>/dev/null) &
     else
-        # Done button clicked - just close, restore clipboard
-        echo -n "$OLD_CLIP" | xclip -selection clipboard
-        log "Done - clipboard restored"
+        # Manual mode: show modal with Copy / Done buttons
+        zenity --text-info \
+            --title="PromptBridge" \
+            --width=700 --height=500 \
+            --ok-label="Copy" --cancel-label="Done" \
+            --filename=/dev/stdin \
+            <<< "$RESULT"
+        BUTTON_CODE=$?
+        
+        if [ $BUTTON_CODE -eq 0 ]; then
+            # Copy button clicked - copy to clipboard
+            echo -n "$RESULT" | xclip -selection clipboard
+        else
+            # Done button clicked - just close, restore clipboard
+            echo -n "$OLD_CLIP" | xclip -selection clipboard
+            log "Done - clipboard restored"
+        fi
     fi
 else
     zenity --error \
