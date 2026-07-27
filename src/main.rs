@@ -185,10 +185,14 @@ zenity --progress --pulsate --no-cancel --auto-close --title="PromptBridge" --te
 ZEN_PID=$!
 
 # 5. Run translation (synchronously, capture output)
-RAW_RESULT=$(promptbridge translate "$TEXTO" 2>>"$LOGFILE")
+RAW_RESULT=$(promptbridge translate "$TEXTO" 2>>"$LOGFILE" 2>&1)
 EXIT_CODE=$?
 # Extract only the translated text (after "--- Transformed Prompt ---")
-RESULT=$(echo "$RAW_RESULT" | sed -n '/--- Transformed Prompt ---/,//p' | tail -n +2)
+if [ -n "$RAW_RESULT" ]; then
+    RESULT=$(echo "$RAW_RESULT" | grep -A 100 -- "--- Transformed Prompt ---" | tail -n +2)
+else
+    RESULT=""
+fi
 log "Exit code: $EXIT_CODE | Result: $RESULT"
 
 # 6. Close the progress dialog
@@ -208,7 +212,6 @@ if [ $EXIT_CODE -eq 0 ] && [ -n "$RESULT" ]; then
     if [ $BUTTON_CODE -eq 0 ]; then
         # Copy button clicked - copy to clipboard
         echo -n "$RESULT" | xclip -selection clipboard
-        log "Copied to clipboard"
     else
         # Done button clicked - just close, restore clipboard
         echo -n "$OLD_CLIP" | xclip -selection clipboard
