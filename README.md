@@ -63,21 +63,30 @@ return
 <details>
 <summary>Click to expand manual installation options</summary>
 
-If you prefer manual installation or need Rust-specific installation:
-
-**Using Cargo:**
+**Option 1: Using Cargo (requires Rust)**
 ```bash
 cargo install promptbridge
 ```
 
-**Download Pre-compiled Binaries:**
+**Option 2: Download Pre-compiled Binaries**
+Choose your platform and download the latest release:
 - [Linux x86_64](https://github.com/pedroaugusto04/PromptBridge/releases/latest/download/promptbridge-x86_64-unknown-linux-gnu.tar.gz)
 - [Linux ARM64](https://github.com/pedroaugusto04/PromptBridge/releases/latest/download/promptbridge-aarch64-unknown-linux-gnu.tar.gz)
 - [Windows x86_64](https://github.com/pedroaugusto04/PromptBridge/releases/latest/download/promptbridge-x86_64-pc-windows-msvc.zip)
 - [macOS Apple Silicon](https://github.com/pedroaugusto04/PromptBridge/releases/latest/download/promptbridge-aarch64-apple-darwin.tar.gz)
 - [macOS Intel](https://github.com/pedroaugusto04/PromptBridge/releases/latest/download/promptbridge-x86_64-apple-darwin.tar.gz)
 
-**Linux Dependencies:**
+Extract and move to your PATH:
+```bash
+# Linux/macOS
+tar -xzf promptbridge-*.tar.gz
+sudo mv promptbridge /usr/local/bin/
+
+# Windows
+Expand-Archive -Path promptbridge.zip -DestinationPath $env:USERPROFILE\.cargo\bin
+```
+
+**Linux Dependencies (required for all installation methods):**
 ```bash
 sudo apt install xclip xdotool zenity -y
 ```
