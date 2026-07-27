@@ -168,7 +168,6 @@ log() { echo "[$(date '+%H:%M:%S')] $1" >> "$LOGFILE"; }
 log "=== pb-translate started ==="
 
 # On Linux/X11, selected text is automatically in the PRIMARY selection.
-# No need to simulate Ctrl+C at all.
 TEXTO=$(xclip -selection primary -o 2>/dev/null)
 log "Input: $TEXTO"
 
