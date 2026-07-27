@@ -245,7 +245,7 @@ fn init_config_interactive() -> Result<()> {
                 .default("http://localhost:11434".to_string())
                 .interact()
                 .map_err(|e| PromptBridgeError::Config(format!("Interactive prompt failed: {}", e)))?;
-            
+
             let model = Input::new()
                 .with_prompt("Model name")
                 .with_initial_text("llama3.2")
@@ -286,12 +286,12 @@ fn init_config_interactive() -> Result<()> {
                 .default("https://api.openai.com/v1".to_string())
                 .interact()
                 .map_err(|e| PromptBridgeError::Config(format!("Interactive prompt failed: {}", e)))?;
-            
+
             let api_key = Input::new()
                 .with_prompt("API key")
                 .interact()
                 .map_err(|e| PromptBridgeError::Config(format!("Interactive prompt failed: {}", e)))?;
-            
+
             let model = Input::new()
                 .with_prompt("Model name")
                 .with_initial_text("gpt-4o-mini")
@@ -332,9 +332,9 @@ fn init_config_interactive() -> Result<()> {
         .default("en".to_string())
         .interact()
         .map_err(|e| PromptBridgeError::Config(format!("Interactive prompt failed: {}", e)))?;
-    
+
     config.general.target_language = target_lang;
-    
+
     // Keep-alive interval
     let keep_alive = Input::new()
         .with_prompt("Keep-alive interval in minutes (0 to disable)")
