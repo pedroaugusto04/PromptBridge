@@ -6,7 +6,7 @@ use promptbridge::exec::ExecGateway;
 use promptbridge::messages::{
     format_provider_list_item, MSG_INPUT_PROMPT_EMPTY,
 };
-use promptbridge::platform::get_platform;
+use promptbridge::platform::{get_platform, get_platform_dialog};
 use promptbridge::providers::{LlmProvider, ProviderFactory};
 use promptbridge::utils::clipboard::copy_to_clipboard;
 use promptbridge::utils::error::{PromptBridgeError, Result};
@@ -21,7 +21,14 @@ async fn main() {
     let cli = Cli::parse();
 
     if let Err(err) = run_app(cli).await {
-        print_error(&err.user_facing_message());
+        let platform = get_platform_dialog();
+        let error_msg = err.user_facing_message();
+        
+        // Try to show error in modal, fall back to stderr
+        if let Err(_) = platform.show_error("PromptBridge Error", &error_msg) {
+            print_error(&error_msg);
+        }
+        
         std::process::exit(1);
     }
 }
@@ -281,7 +288,7 @@ fn init_config_interactive() -> Result<()> {
                 base_url: Some(base_url),
                 api_key,
                 model: Some(model),
-                temperature: Some(0.2),
+                temperature: Some(0.0),
             };
             
             config.providers.insert("ollama".to_string(), provider_config);
@@ -321,7 +328,7 @@ fn init_config_interactive() -> Result<()> {
                 base_url: Some(base_url),
                 api_key: Some(api_key),
                 model: Some(model),
-                temperature: Some(0.2),
+                temperature: Some(0.0),
             };
             
             config.providers.insert("openai".to_string(), provider_config);

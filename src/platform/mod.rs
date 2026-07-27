@@ -99,3 +99,26 @@ pub fn get_platform() -> Box<dyn PlatformShortcutInstaller> {
         compile_error!("Unsupported platform");
     }
 }
+
+/// Get the platform-specific dialog implementation
+pub fn get_platform_dialog() -> Box<dyn PlatformDialog> {
+    #[cfg(target_os = "linux")]
+    {
+        Box::new(linux::LinuxPlatform::new())
+    }
+    
+    #[cfg(target_os = "windows")]
+    {
+        Box::new(windows::WindowsPlatform::new())
+    }
+    
+    #[cfg(target_os = "macos")]
+    {
+        Box::new(macos::MacosPlatform::new())
+    }
+    
+    #[cfg(not(any(target_os = "linux", target_os = "windows", target_os = "macos")))]
+    {
+        compile_error!("Unsupported platform");
+    }
+}
