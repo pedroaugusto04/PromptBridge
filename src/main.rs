@@ -6,6 +6,7 @@ use promptbridge::exec::ExecGateway;
 use promptbridge::messages::{
     format_provider_list_item, MSG_INPUT_PROMPT_EMPTY,
 };
+use promptbridge::platform::get_platform;
 use promptbridge::providers::{LlmProvider, ProviderFactory};
 use promptbridge::utils::clipboard::copy_to_clipboard;
 use promptbridge::utils::error::{PromptBridgeError, Result};
@@ -136,134 +137,13 @@ async fn run_app(cli: Cli) -> Result<()> {
 }
 
 fn install_shortcut() -> Result<()> {
-    // 1. Create default config file if it does not exist
-    if let Some(mut user_config_dir) = dirs::config_dir() {
-        user_config_dir.push("promptbridge");
-        std::fs::create_dir_all(&user_config_dir)?;
-        let config_file = user_config_dir.join("promptbridge.toml");
-        if !config_file.exists() {
-            std::fs::write(&config_file, promptbridge::constants::DEFAULT_CONFIG_TOML)?;
-            println!("✓ Created global config template at: {}", config_file.display());
-        }
-    }
-
-    // 2. Create the shortcut script in ~/.local/bin/pb-translate
-    if let Some(home_dir) = dirs::home_dir() {
-        let bin_dir = home_dir.join(".local").join("bin");
-        std::fs::create_dir_all(&bin_dir)?;
-        let script_path = bin_dir.join("pb-translate");
-        
-        let script_content = r#"#!/bin/bash
-
-# Make DBUS available when launched from a keyboard shortcut
-export DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$(id -u)/bus"
-# Ensure cargo bin is in PATH (may be missing in shortcut context)
-export PATH="$HOME/.cargo/bin:$PATH"
-
-# Log file for debugging
-LOGFILE="$HOME/.local/share/promptbridge/pb-translate.log"
-mkdir -p "$(dirname "$LOGFILE")"
-log() { echo "[$(date '+%H:%M:%S')] $1" >> "$LOGFILE"; }
-
-log "=== pb-translate started ==="
-
-# On Linux/X11, selected text is automatically in the PRIMARY selection.
-TEXTO=$(xclip -selection primary -o 2>/dev/null)
-log "Input: $TEXTO"
-
-# If nothing is selected, exit gracefully
-if [ -z "$TEXTO" ]; then
-    log "No text selected — exiting"
-    exit 0
-fi
-
-# Backup current CLIPBOARD content so we can restore on cancel
-OLD_CLIP=$(xclip -selection clipboard -o 2>/dev/null)
-
-# 4. Show pulsating progress dialog while translating
-zenity --progress --pulsate --no-cancel --auto-close --title="PromptBridge" --text="Translating..." --width=300 &
-ZEN_PID=$!
-
-# 5. Run translation (synchronously, capture output)
-RAW_RESULT=$(promptbridge translate "$TEXTO" 2>>"$LOGFILE" 2>&1)
-EXIT_CODE=$?
-# Extract only the translated text (after "--- Transformed Prompt ---")
-if [ -n "$RAW_RESULT" ]; then
-    RESULT=$(echo "$RAW_RESULT" | grep -A 100 -- "--- Transformed Prompt ---" | tail -n +2)
-else
-    RESULT=""
-fi
-log "Exit code: $EXIT_CODE | Result: $RESULT"
-
-# 6. Close the progress dialog
-kill $ZEN_PID 2>/dev/null
-wait $ZEN_PID 2>/dev/null
-
-# 7. Check if auto_copy is enabled in config
-CONFIG_FILE="$HOME/.config/promptbridge/promptbridge.toml"
-AUTO_COPY=$(grep -E "^auto_copy_clipboard\s*=" "$CONFIG_FILE" 2>/dev/null | cut -d= -f2 | tr -d ' "')
-
-# 8. Show result based on auto_copy setting
-if [ $EXIT_CODE -eq 0 ] && [ -n "$RESULT" ]; then
-    if [ "$AUTO_COPY" = "true" ]; then
-        # Auto-copy mode: copy silently and show smooth success notification
-        echo -n "$RESULT" | xclip -selection clipboard
-        log "Auto-copied to clipboard"
-        
-        # Show smooth success notification with PromptBridge app name
-        (notify-send --app-name="PromptBridge" --icon="info" "Translation" "✓ Translated & copied!" &
-        NOTIFY_PID=$!
-        sleep 1.5
-        kill $NOTIFY_PID 2>/dev/null) &
-    else
-        # Manual mode: show modal with Copy / Done buttons
-        zenity --text-info \
-            --title="PromptBridge" \
-            --width=700 --height=500 \
-            --ok-label="Copy" --cancel-label="Done" \
-            --filename=/dev/stdin \
-            <<< "$RESULT"
-        BUTTON_CODE=$?
-        
-        if [ $BUTTON_CODE -eq 0 ]; then
-            # Copy button clicked - copy to clipboard
-            echo -n "$RESULT" | xclip -selection clipboard
-        else
-            # Done button clicked - just close, restore clipboard
-            echo -n "$OLD_CLIP" | xclip -selection clipboard
-            log "Done - clipboard restored"
-        fi
-    fi
-else
-    zenity --error \
-        --title="PromptBridge" \
-        --text="Translation failed.\nSee log for details:\n$LOGFILE" \
-        --width=450
-    echo -n "$OLD_CLIP" | xclip -selection clipboard
-fi
-
-log "=== pb-translate done ==="
-"#;
-
-        std::fs::write(&script_path, script_content)?;
-        
-        #[cfg(unix)]
-        {
-            use std::os::unix::fs::PermissionsExt;
-            let mut perms = std::fs::metadata(&script_path)?.permissions();
-            perms.set_mode(0o755);
-            std::fs::set_permissions(&script_path, perms)?;
-        }
-        
-        println!("✓ Created helper script at: {}", script_path.display());
-        println!("\n=== Installation complete ===");
-        println!("Please configure the keyboard shortcut in your OS Settings:");
-        println!("  Shortcut Command: pb-translate");
-        println!("  Example Shortcut Keys: Ctrl+Alt+T");
-    } else {
-        return Err(PromptBridgeError::Engine("Could not locate home directory".to_string()));
-    }
-
+    let platform = get_platform();
+    let result = platform.install_shortcut()?;
+    
+    println!("✓ Created helper script at: {}", result.script_path);
+    println!("\n=== Installation complete ===");
+    println!("{}", result.config_instructions);
+    
     Ok(())
 }
 

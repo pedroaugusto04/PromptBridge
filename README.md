@@ -4,7 +4,9 @@ Translates coding prompts from your native language (e.g., Portuguese) to anothe
 
 ---
 
-## Installation (Linux)
+## Installation
+
+### Linux
 
 ### Step 1: Install Rust & Cargo
 If you don't have Rust installed, install it first via [rustup](https://rustup.rs/):
@@ -38,6 +40,89 @@ promptbridge install-shortcut
   * **Command**: `pb-translate`
   * **Shortcut**: Set your preferred key combination (e.g., `Ctrl+Alt+T` or `Super+T`).
 
+### Windows
+
+#### Step 1: Install Rust & Cargo
+If you don't have Rust installed, install it first via [rustup](https://rustup.rs/):
+```powershell
+# In PowerShell
+Invoke-WebRequest -Uri https://win.rustup.rs/x86_64 -OutFile rustup-init.exe
+.\rustup-init.exe
+```
+
+#### Step 2: Install PromptBridge
+```powershell
+cargo install promptbridge
+```
+
+#### Step 3: Run the Auto-Installer
+To generate the translation keyboard shortcut runner and default configuration, run:
+```powershell
+promptbridge install-shortcut
+```
+
+> **Important**: This command creates your global configuration file at `%APPDATA%\promptbridge\promptbridge.toml`. Make sure to open this file and configure your AI provider (e.g., set your OpenAI API key or custom Ollama URL)
+
+#### Step 4: Configure the System Hotkey
+Windows requires additional setup for global hotkeys. Choose one of the following methods:
+
+**Option A: Using AutoHotkey (Recommended)**
+1. Install [AutoHotkey](https://www.autohotkey.com/)
+2. Create an AutoHotkey script with:
+```autohotkey
+^t::  ; Ctrl+T
+Run, PowerShell.exe -ExecutionPolicy Bypass -File "%APPDATA%\promptbridge\pb-translate.ps1"
+return
+```
+3. Save as `promptbridge.ahk` and run it
+
+**Option B: Using PowerShell Shortcut**
+1. Create a shortcut on your desktop
+2. Set target to: `powershell.exe -ExecutionPolicy Bypass -File "%APPDATA%\promptbridge\pb-translate.ps1"`
+3. Right-click shortcut -> Properties -> Shortcut Key
+4. Set your preferred key combination (e.g., `Ctrl+Alt+T`)
+
+### macOS
+
+#### Step 1: Install Rust & Cargo
+If you don't have Rust installed, install it first via [rustup](https://rustup.rs/):
+```bash
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+```
+
+#### Step 2: Install PromptBridge
+```bash
+cargo install promptbridge
+```
+
+#### Step 3: Run the Auto-Installer
+To generate the translation keyboard shortcut runner and default configuration, run:
+```bash
+promptbridge install-shortcut
+```
+
+> **Important**: This command creates your global configuration file at `~/Library/Application Support/promptbridge/promptbridge.toml`. Make sure to open this file and configure your AI provider (e.g., set your OpenAI API key or custom Ollama URL)
+
+#### Step 4: Configure the System Hotkey
+macOS requires using Automator to create a Quick Action:
+
+1. Open **Automator** (Applications -> Automator)
+2. Choose **Quick Action** as the document type
+3. Set:
+   - Workflow receives current: **text**
+   - in: **any application**
+4. Add **Run Shell Script** action
+5. Set shell to: `/bin/bash`
+6. Set script to:
+```bash
+~/Library/Application\ Support/promptbridge/pb-translate.sh
+```
+7. Save as `PromptBridge Translate`
+8. Open **System Settings** -> **Keyboard** -> **Keyboard Shortcuts** -> **Services**
+9. Find `PromptBridge Translate` and assign your shortcut (e.g., `Ctrl+Alt+T`)
+
+> **Note**: On macOS, you need to copy text to the clipboard before pressing the hotkey, as macOS doesn't have a primary selection like Linux.
+
 ---
 
 ## Usage
@@ -53,8 +138,20 @@ Inside **any** chat interface (terminal TUIs like `opencode`/`aider`, VS Code, o
 ## Customizing Configuration
 
 You can customize your language, change providers, or adjust model settings at any time by editing the global config file:
+
+**Linux:**
 ```bash
 nano ~/.config/promptbridge/promptbridge.toml
+```
+
+**Windows:**
+```powershell
+notepad $env:APPDATA\promptbridge\promptbridge.toml
+```
+
+**macOS:**
+```bash
+nano ~/Library/Application\ Support/promptbridge/promptbridge.toml
 ```
 
 ### Config File Example & Options

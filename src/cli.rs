@@ -5,7 +5,7 @@ use std::path::PathBuf;
 #[command(
     name = "promptbridge",
     author = "PromptBridge Contributors",
-    version = "0.1.16",
+    version = "0.2.0",
     about = "CLI-agnostic prompt gateway: translates and optimizes developer prompts while preserving technical content."
 )]
 pub struct Cli {
