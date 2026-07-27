@@ -89,6 +89,12 @@ impl TechnicalParser {
     /// Re-hydrates placeholders back to their exact original text
     pub fn restore(transformed: &str, items: &[ExtractedItem]) -> String {
         let mut result = transformed.to_string();
+        
+        // If no items to restore, return as-is
+        if items.is_empty() {
+            return result;
+        }
+        
         let mut item_map: HashMap<String, String> = HashMap::new();
 
         for item in items {

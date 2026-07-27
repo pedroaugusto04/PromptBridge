@@ -27,6 +27,19 @@ impl TransformationPipeline {
 
         // 2. Build system prompt
         let system_prompt = TemplateEngine::get_system_prompt(mode, target_language);
+        
+        // Only include placeholder instructions if there are actually placeholders
+        let system_prompt = if extracted_items.is_empty() {
+            // Simplified system prompt without placeholder instructions
+            format!(
+                "You are PromptBridge, an expert AI prompt engineering system.\n\n\
+                 TASK: Translate the natural language text into clean, professional '{}'.\n\
+                 Output Format: Return ONLY the transformed prompt text. Do NOT include markdown code blocks around the entire output, meta commentary, or greetings.",
+                target_language
+            )
+        } else {
+            system_prompt
+        };
 
         // 3. Prepare completion request
         let request = CompletionRequest {
