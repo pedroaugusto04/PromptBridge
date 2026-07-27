@@ -1,3 +1,3 @@
 {base_instructions}
 
-TASK: Translate the natural language text into clean, professional '{target_language}'. Keep all code, placeholders, and technical identifiers identical.
+TASK: Translate the natural language text into '{target_language}'. Maintain the original meaning and structure as faithfully as possible. Keep all code, placeholders, and technical identifiers identical. Avoid unnecessary reformulation or stylistic changes.
