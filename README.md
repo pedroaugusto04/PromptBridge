@@ -10,12 +10,12 @@ A quick CLI tool that translates coding prompts from your native language (e.g.,
 
 **Linux/macOS:**
 ```bash
-curl -sSL https://raw.githubusercontent.com/pedroaugusto04/PromptBridge/main/install.sh | sh
+curl -sSL https://raw.githubusercontent.com/pedroaugusto04/PromptBridge/main/scripts/install.sh | sh
 ```
 
 **Windows (PowerShell):**
 ```powershell
-irm https://raw.githubusercontent.com/pedroaugusto04/PromptBridge/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/pedroaugusto04/PromptBridge/main/scripts/install.ps1 | iex
 ```
 
 ### Setup
