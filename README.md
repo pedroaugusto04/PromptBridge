@@ -53,15 +53,29 @@ sudo mv promptbridge /usr/local/bin/
 sudo apt install xclip xdotool zenity -y
 ```
 
-### Step 3: Run the Auto-Installer
-To generate the translation keyboard shortcut runner and default configuration, run:
+### Step 3: Configure (Interactive)
+Run the interactive configuration wizard to set up your AI provider:
+```bash
+promptbridge init-config
+```
+
+This will guide you through:
+- Selecting your LLM provider (Ollama, OpenAI, or Mock)
+- Configuring provider-specific settings (URL, model, API keys)
+- Setting your target language
+- Configuring keep-alive interval
+
+Alternatively, you can manually edit the configuration file after running the shortcut installer.
+
+### Step 4: Run the Auto-Installer
+To generate the translation keyboard shortcut runner, run:
 ```bash
 promptbridge install-shortcut
 ```
 
-> **Important**: This command creates your global configuration file at `~/.config/promptbridge/promptbridge.toml`. Make sure to open this file and configure your AI provider (e.g., set your OpenAI API key or custom Ollama URL)
+> **Important**: This creates your global configuration file at `~/.config/promptbridge/promptbridge.toml`. If you didn't run `init-config`, make sure to open this file and configure your AI provider (e.g., set your OpenAI API key or custom Ollama URL)
 
-### Step 4: Configure the System Hotkey
+### Step 5: Configure the System Hotkey
 * Open your system **Settings** -> **Keyboard** -> **Keyboard Shortcuts** -> **Custom Shortcuts (+)**.
 * Create a new shortcut:
   * **Name**: `PromptBridge Translate`
@@ -89,15 +103,29 @@ Invoke-WebRequest -Uri "https://github.com/pedroaugusto04/PromptBridge/releases/
 Expand-Archive -Path promptbridge.zip -DestinationPath $env:USERPROFILE\.cargo\bin
 ```
 
-#### Step 2: Run the Auto-Installer
-To generate the translation keyboard shortcut runner and default configuration, run:
+#### Step 2: Configure (Interactive)
+Run the interactive configuration wizard to set up your AI provider:
+```powershell
+promptbridge init-config
+```
+
+This will guide you through:
+- Selecting your LLM provider (Ollama, OpenAI, or Mock)
+- Configuring provider-specific settings (URL, model, API keys)
+- Setting your target language
+- Configuring keep-alive interval
+
+Alternatively, you can manually edit the configuration file after running the shortcut installer.
+
+#### Step 3: Run the Auto-Installer
+To generate the translation keyboard shortcut runner, run:
 ```powershell
 promptbridge install-shortcut
 ```
 
-> **Important**: This command creates your global configuration file at `%APPDATA%\promptbridge\promptbridge.toml`. Make sure to open this file and configure your AI provider (e.g., set your OpenAI API key or custom Ollama URL)
+> **Important**: This creates your global configuration file at `%APPDATA%\promptbridge\promptbridge.toml`. If you didn't run `init-config`, make sure to open this file and configure your AI provider (e.g., set your OpenAI API key or custom Ollama URL)
 
-#### Step 3: Configure the System Hotkey
+#### Step 4: Configure the System Hotkey
 Windows requires additional setup for global hotkeys. Choose one of the following methods:
 
 **Option A: Using AutoHotkey (Recommended)**
@@ -140,15 +168,29 @@ tar -xzf promptbridge-*.tar.gz
 sudo mv promptbridge /usr/local/bin/
 ```
 
-#### Step 2: Run the Auto-Installer
-To generate the translation keyboard shortcut runner and default configuration, run:
+#### Step 2: Configure (Interactive)
+Run the interactive configuration wizard to set up your AI provider:
+```bash
+promptbridge init-config
+```
+
+This will guide you through:
+- Selecting your LLM provider (Ollama, OpenAI, or Mock)
+- Configuring provider-specific settings (URL, model, API keys)
+- Setting your target language
+- Configuring keep-alive interval
+
+Alternatively, you can manually edit the configuration file after running the shortcut installer.
+
+#### Step 3: Run the Auto-Installer
+To generate the translation keyboard shortcut runner, run:
 ```bash
 promptbridge install-shortcut
 ```
 
-> **Important**: This command creates your global configuration file at `~/Library/Application Support/promptbridge/promptbridge.toml`. Make sure to open this file and configure your AI provider (e.g., set your OpenAI API key or custom Ollama URL)
+> **Important**: This creates your global configuration file at `~/Library/Application Support/promptbridge/promptbridge.toml`. If you didn't run `init-config`, make sure to open this file and configure your AI provider (e.g., set your OpenAI API key or custom Ollama URL)
 
-#### Step 3: Configure the System Hotkey
+#### Step 4: Configure the System Hotkey
 macOS requires using Automator to create a Quick Action:
 
 1. Open **Automator** (Applications -> Automator)

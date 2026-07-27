@@ -78,6 +78,9 @@ pub enum Commands {
         action: Option<ConfigSubcommand>,
     },
 
+    /// Initialize configuration interactively
+    InitConfig,
+
     /// List configured LLM providers
     Providers,
 

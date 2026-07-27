@@ -1,6 +1,6 @@
 use clap::Parser;
 use promptbridge::cli::{Cli, Commands, ConfigSubcommand};
-use promptbridge::config::Config;
+use promptbridge::config::{Config, ProviderConfig};
 use promptbridge::engine::{TransformMode, TransformationPipeline};
 use promptbridge::exec::ExecGateway;
 use promptbridge::messages::{
@@ -131,6 +131,10 @@ async fn run_app(cli: Cli) -> Result<()> {
         Commands::InstallShortcut => {
             install_shortcut()?;
         }
+
+        Commands::InitConfig => {
+            init_config_interactive()?;
+        }
     }
 
     Ok(())
@@ -196,6 +200,160 @@ async fn process_single_prompt(
         copy_to_clipboard(&result.final_prompt)?;
     }
 
+    Ok(())
+}
+
+fn init_config_interactive() -> Result<()> {
+    use dialoguer::{Select, Input, Confirm};
+    
+    println!("PromptBridge Interactive Configuration\n");
+    
+    // Get config directory
+    let config_dir = dirs::config_dir()
+        .ok_or_else(|| PromptBridgeError::Config("Could not determine config directory".to_string()))?
+        .join("promptbridge");
+    
+    std::fs::create_dir_all(&config_dir)?;
+    let config_path = config_dir.join("promptbridge.toml");
+    
+    // Load existing config or create default
+    let mut config = if config_path.exists() {
+        let content = std::fs::read_to_string(&config_path)?;
+        toml::from_str::<Config>(&content).map_err(|e| PromptBridgeError::Config(e.to_string()))?
+    } else {
+        Config::load(None)?
+    };
+    
+    // Select provider
+    let providers = vec!["ollama", "openai", "mock"];
+    let selection = Select::new()
+        .with_prompt("Select your LLM provider")
+        .items(&providers)
+        .default(0)
+        .interact()
+        .map_err(|e| PromptBridgeError::Config(format!("Interactive prompt failed: {}", e)))?;
+    
+    let selected_provider = providers[selection];
+    config.general.default_provider = selected_provider.to_string();
+    
+    // Provider-specific configuration
+    match selected_provider {
+        "ollama" => {
+            let base_url = Input::new()
+                .with_prompt("Ollama base URL")
+                .with_initial_text("http://localhost:11434")
+                .default("http://localhost:11434".to_string())
+                .interact()
+                .map_err(|e| PromptBridgeError::Config(format!("Interactive prompt failed: {}", e)))?;
+            
+            let model = Input::new()
+                .with_prompt("Model name")
+                .with_initial_text("llama3.2")
+                .default("llama3.2".to_string())
+                .interact()
+                .map_err(|e| PromptBridgeError::Config(format!("Interactive prompt failed: {}", e)))?;
+            
+            let use_auth = Confirm::new()
+                .with_prompt("Does your Ollama instance require authentication?")
+                .default(false)
+                .interact()
+                .map_err(|e| PromptBridgeError::Config(format!("Interactive prompt failed: {}", e)))?;
+            
+            let api_key = if use_auth {
+                Some(Input::new()
+                    .with_prompt("API key / Bearer token")
+                    .interact()
+                    .map_err(|e| PromptBridgeError::Config(format!("Interactive prompt failed: {}", e)))?)
+            } else {
+                None
+            };
+            
+            let provider_config = ProviderConfig {
+                provider_type: "ollama".to_string(),
+                base_url: Some(base_url),
+                api_key,
+                model: Some(model),
+                temperature: Some(0.2),
+            };
+            
+            config.providers.insert("ollama".to_string(), provider_config);
+        }
+        
+        "openai" => {
+            let base_url = Input::new()
+                .with_prompt("OpenAI API base URL")
+                .with_initial_text("https://api.openai.com/v1")
+                .default("https://api.openai.com/v1".to_string())
+                .interact()
+                .map_err(|e| PromptBridgeError::Config(format!("Interactive prompt failed: {}", e)))?;
+            
+            let api_key = Input::new()
+                .with_prompt("API key")
+                .interact()
+                .map_err(|e| PromptBridgeError::Config(format!("Interactive prompt failed: {}", e)))?;
+            
+            let model = Input::new()
+                .with_prompt("Model name")
+                .with_initial_text("gpt-4o-mini")
+                .default("gpt-4o-mini".to_string())
+                .interact()
+                .map_err(|e| PromptBridgeError::Config(format!("Interactive prompt failed: {}", e)))?;
+            
+            let provider_config = ProviderConfig {
+                provider_type: "openai".to_string(),
+                base_url: Some(base_url),
+                api_key: Some(api_key),
+                model: Some(model),
+                temperature: Some(0.2),
+            };
+            
+            config.providers.insert("openai".to_string(), provider_config);
+        }
+        
+        "mock" => {
+            let provider_config = ProviderConfig {
+                provider_type: "mock".to_string(),
+                base_url: None,
+                api_key: None,
+                model: None,
+                temperature: Some(0.0),
+            };
+            
+            config.providers.insert("mock".to_string(), provider_config);
+        }
+        
+        _ => unreachable!(),
+    }
+    
+    // Target language
+    let target_lang = Input::new()
+        .with_prompt("Target language for translation")
+        .with_initial_text("en")
+        .default("en".to_string())
+        .interact()
+        .map_err(|e| PromptBridgeError::Config(format!("Interactive prompt failed: {}", e)))?;
+    
+    config.general.target_language = target_lang;
+    
+    // Keep-alive interval
+    let keep_alive = Input::new()
+        .with_prompt("Keep-alive interval in minutes (0 to disable)")
+        .with_initial_text("60")
+        .default("60".to_string())
+        .interact()
+        .map_err(|e| PromptBridgeError::Config(format!("Interactive prompt failed: {}", e)))?;
+    
+    config.general.keep_alive_interval_minutes = Some(keep_alive.parse::<u64>().unwrap_or(60));
+    
+    // Save configuration
+    let toml_str = toml::to_string_pretty(&config)
+        .map_err(|e| PromptBridgeError::Config(e.to_string()))?;
+    
+    std::fs::write(&config_path, toml_str)?;
+    
+    println!("\nConfiguration saved to: {}", config_path.display());
+    println!("You can edit this file manually if needed.");
+    
     Ok(())
 }
 
