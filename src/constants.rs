@@ -73,7 +73,7 @@ pub const DEFAULT_CONFIG_TOML: &str = r#"
 default_provider = "ollama"
 target_language = "en"
 mode = "preview"
-auto_copy_clipboard = false
+auto_copy_clipboard = true
 preserve_technical_terms = true
 request_timeout_seconds = 60
 
