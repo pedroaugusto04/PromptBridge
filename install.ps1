@@ -14,7 +14,7 @@ New-Item -ItemType Directory -Path $tmpDir -Force | Out-Null
 try {
     # Download latest release
     Write-Host "Downloading PromptBridge $binary..." -ForegroundColor Cyan
-    $latestUrl = "https://github.com/pedroaugusto04/PromptBridge/releases/latest/download/${binary}"
+    $latestUrl = "https://github.com/pedroaugusto04/PromptBridge/releases/download/v0.2.3/${binary}"
     $zipPath = Join-Path $tmpDir "promptbridge.zip"
     
     try {

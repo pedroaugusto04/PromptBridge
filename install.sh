@@ -40,7 +40,7 @@ trap "rm -rf $TMP_DIR" EXIT
 
 # Download latest release
 echo "Downloading PromptBridge $BINARY..."
-LATEST_URL="https://github.com/pedroaugusto04/PromptBridge/releases/latest/download/${BINARY}.tar.gz"
+LATEST_URL="https://github.com/pedroaugusto04/PromptBridge/releases/download/v0.2.3/${BINARY}.tar.gz"
 echo "Downloading from: $LATEST_URL"
 if ! curl -fSL "$LATEST_URL" -o "$TMP_DIR/promptbridge.tar.gz"; then
     echo "❌ Failed to download binary from: $LATEST_URL"
@@ -117,7 +117,7 @@ if [[ ":$PATH:" != *":$INSTALL_DIR:"* ]]; then
         echo "export PATH=\"$INSTALL_DIR:\$PATH\"" >> "$CONFIG_FILE"
         echo "✅ Added to PATH in $CONFIG_FILE"
     else
-        echo "ℹ️  Already in PATH configuration"
+        echo "Already in PATH configuration"
     fi
     
     echo ""
