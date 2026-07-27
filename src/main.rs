@@ -167,28 +167,19 @@ log() { echo "[$(date '+%H:%M:%S')] $1" >> "$LOGFILE"; }
 
 log "=== pb-translate started ==="
 
-# Save the focused window IMMEDIATELY before anything changes focus
-FOCUSED_WIN=$(xdotool getwindowfocus 2>/dev/null)
-log "Focused window: $FOCUSED_WIN"
-
-# 1. Clear clipboard to detect if text was actually selected
-OLD_CLIP=$(xclip -selection clipboard -o 2>/dev/null)
-echo -n "" | xclip -selection clipboard
-
-# 2. Send Ctrl+C to the previously focused window specifically
-xdotool key --window "$FOCUSED_WIN" --clearmodifiers ctrl+c
-sleep 0.3
-
-# 3. Get text from clipboard
-TEXTO=$(xclip -selection clipboard -o 2>/dev/null)
+# On Linux/X11, selected text is automatically in the PRIMARY selection.
+# No need to simulate Ctrl+C at all.
+TEXTO=$(xclip -selection primary -o 2>/dev/null)
 log "Input: $TEXTO"
 
-# If nothing was copied, restore old clipboard and exit gracefully
+# If nothing is selected, exit gracefully
 if [ -z "$TEXTO" ]; then
     log "No text selected — exiting"
-    echo -n "$OLD_CLIP" | xclip -selection clipboard
     exit 0
 fi
+
+# Backup current CLIPBOARD content so we can restore on cancel
+OLD_CLIP=$(xclip -selection clipboard -o 2>/dev/null)
 
 # 4. Show pulsating progress dialog while translating
 zenity --progress --pulsate --no-cancel --title="PromptBridge" --text="Translating..." --width=300 &
