@@ -193,20 +193,24 @@ log "Exit code: $EXIT_CODE | Result: $RESULT"
 kill $ZEN_PID 2>/dev/null
 wait $ZEN_PID 2>/dev/null
 
-# 7. Show result in a modal with Paste / Cancel
+# 7. Show result in a modal with Copy / Done
 if [ $EXIT_CODE -eq 0 ] && [ -n "$RESULT" ]; then
     zenity --text-info \
-        --title="PromptBridge — Translation Result" \
-        --width=600 --height=400 \
-        --ok-label="Paste" --cancel-label="Cancel" \
+        --title="PromptBridge" \
+        --width=700 --height=500 \
+        --ok-label="Copy" --cancel-label="Done" \
+        --filename=/dev/stdin \
         <<< "$RESULT"
-    if [ $? -eq 0 ]; then
+    BUTTON_CODE=$?
+    
+    if [ $BUTTON_CODE -eq 0 ]; then
+        # Copy button clicked - copy to clipboard
         echo -n "$RESULT" | xclip -selection clipboard
-        xdotool key ctrl+v
-        log "Pasted successfully"
+        log "Copied to clipboard"
     else
+        # Done button clicked - just close, restore clipboard
         echo -n "$OLD_CLIP" | xclip -selection clipboard
-        log "User cancelled"
+        log "Done - clipboard restored"
     fi
 else
     zenity --error \
