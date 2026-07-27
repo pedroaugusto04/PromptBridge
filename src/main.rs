@@ -185,10 +185,10 @@ zenity --progress --pulsate --no-cancel --auto-close --title="PromptBridge" --te
 ZEN_PID=$!
 
 # 5. Run translation (synchronously, capture output)
-RAW_RESULT=$(promptbridge translate "$TEXTO" 2>>"$LOGFILE" 2>/dev/null)
+RAW_RESULT=$(promptbridge translate "$TEXTO" 2>>"$LOGFILE")
 EXIT_CODE=$?
-# Filter out success messages (lines starting with ✓)
-RESULT=$(echo "$RAW_RESULT" | grep -v "^✓")
+# Extract only the translated text (after "--- Transformed Prompt ---")
+RESULT=$(echo "$RAW_RESULT" | sed -n '/--- Transformed Prompt ---/,//p' | tail -n +2)
 log "Exit code: $EXIT_CODE | Result: $RESULT"
 
 # 6. Close the progress dialog
