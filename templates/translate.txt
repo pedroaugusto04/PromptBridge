@@ -1,3 +1,9 @@
 {base_instructions}
 
-TASK: Translate the natural language text into '{target_language}'. Maintain the original meaning and structure as faithfully as possible. Keep all code, placeholders, and technical identifiers identical. Avoid unnecessary reformulation or stylistic changes.
+Translate the text to {target_language}.
+
+Rules:
+- Preserve meaning and sentence structure.
+- Do not paraphrase.
+- Keep code, placeholders, paths, commands, and identifiers unchanged.
+- Return only the translation.
