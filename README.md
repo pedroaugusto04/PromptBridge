@@ -71,7 +71,7 @@ target_language = "en"
 request_timeout_seconds = 60
 
 # Automatically copy the translated prompt to the system clipboard
-auto_copy_clipboard = false
+auto_copy_clipboard = true
 
 # Safely extract and preserve paths/code during translation
 preserve_technical_terms = true
