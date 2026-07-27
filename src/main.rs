@@ -239,9 +239,8 @@ fn init_config_interactive() -> Result<()> {
     // Provider-specific configuration
     match selected_provider {
         "ollama" => {
-            println!("Default: http://localhost:11434");
             let base_url: String = Input::new()
-                .with_prompt("Ollama base URL")
+                .with_prompt("Ollama base URL (default: http://localhost:11434)")
                 .interact()
                 .map_err(|e| PromptBridgeError::Config(format!("Interactive prompt failed: {}", e)))?;
             let base_url = if base_url.is_empty() {
@@ -250,9 +249,8 @@ fn init_config_interactive() -> Result<()> {
                 base_url
             };
 
-            println!("Default: llama3.2");
             let model: String = Input::new()
-                .with_prompt("Model name")
+                .with_prompt("Model name (default: llama3.2)")
                 .interact()
                 .map_err(|e| PromptBridgeError::Config(format!("Interactive prompt failed: {}", e)))?;
             let model = if model.is_empty() {
@@ -288,9 +286,8 @@ fn init_config_interactive() -> Result<()> {
         }
         
         "openai" => {
-            println!("Default: https://api.openai.com/v1");
             let base_url: String = Input::new()
-                .with_prompt("OpenAI API base URL")
+                .with_prompt("OpenAI API base URL (default: https://api.openai.com/v1)")
                 .interact()
                 .map_err(|e| PromptBridgeError::Config(format!("Interactive prompt failed: {}", e)))?;
             let base_url = if base_url.is_empty() {
@@ -304,9 +301,8 @@ fn init_config_interactive() -> Result<()> {
                 .interact()
                 .map_err(|e| PromptBridgeError::Config(format!("Interactive prompt failed: {}", e)))?;
 
-            println!("Default: gpt-4o-mini");
             let model: String = Input::new()
-                .with_prompt("Model name")
+                .with_prompt("Model name (default: gpt-4o-mini)")
                 .interact()
                 .map_err(|e| PromptBridgeError::Config(format!("Interactive prompt failed: {}", e)))?;
             let model = if model.is_empty() {
@@ -342,9 +338,8 @@ fn init_config_interactive() -> Result<()> {
     }
     
     // Target language
-    println!("Default: en");
     let target_lang: String = Input::new()
-        .with_prompt("Target language for translation")
+        .with_prompt("Target language for translation (default: en)")
         .interact()
         .map_err(|e| PromptBridgeError::Config(format!("Interactive prompt failed: {}", e)))?;
     let target_lang = if target_lang.is_empty() {
@@ -356,9 +351,8 @@ fn init_config_interactive() -> Result<()> {
     config.general.target_language = target_lang;
 
     // Keep-alive interval
-    println!("Default: 60");
     let keep_alive: String = Input::new()
-        .with_prompt("Keep-alive interval in minutes (0 to disable)")
+        .with_prompt("Keep-alive interval in minutes (0 to disable, default: 60)")
         .interact()
         .map_err(|e| PromptBridgeError::Config(format!("Interactive prompt failed: {}", e)))?;
     let keep_alive = if keep_alive.is_empty() {
