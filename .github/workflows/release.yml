@@ -17,11 +17,6 @@ jobs:
             artifact_name: promptbridge-linux-amd64
             asset_name: promptbridge-x86_64-unknown-linux-gnu.tar.gz
 
-          - os: ubuntu-latest
-            target: aarch64-unknown-linux-gnu
-            artifact_name: promptbridge-linux-arm64
-            asset_name: promptbridge-aarch64-unknown-linux-gnu.tar.gz
-
           - os: windows-latest
             target: x86_64-pc-windows-msvc
             artifact_name: promptbridge.exe
