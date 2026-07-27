@@ -239,17 +239,27 @@ fn init_config_interactive() -> Result<()> {
     // Provider-specific configuration
     match selected_provider {
         "ollama" => {
-            let base_url = Input::new()
+            println!("Default: http://localhost:11434");
+            let base_url: String = Input::new()
                 .with_prompt("Ollama base URL")
-                .default("http://localhost:11434".to_string())
                 .interact()
                 .map_err(|e| PromptBridgeError::Config(format!("Interactive prompt failed: {}", e)))?;
+            let base_url = if base_url.is_empty() {
+                "http://localhost:11434".to_string()
+            } else {
+                base_url
+            };
 
-            let model = Input::new()
+            println!("Default: llama3.2");
+            let model: String = Input::new()
                 .with_prompt("Model name")
-                .default("llama3.2".to_string())
                 .interact()
                 .map_err(|e| PromptBridgeError::Config(format!("Interactive prompt failed: {}", e)))?;
+            let model = if model.is_empty() {
+                "llama3.2".to_string()
+            } else {
+                model
+            };
             
             let use_auth = Confirm::new()
                 .with_prompt("Does your Ollama instance require authentication?")
@@ -278,22 +288,32 @@ fn init_config_interactive() -> Result<()> {
         }
         
         "openai" => {
-            let base_url = Input::new()
+            println!("Default: https://api.openai.com/v1");
+            let base_url: String = Input::new()
                 .with_prompt("OpenAI API base URL")
-                .default("https://api.openai.com/v1".to_string())
                 .interact()
                 .map_err(|e| PromptBridgeError::Config(format!("Interactive prompt failed: {}", e)))?;
+            let base_url = if base_url.is_empty() {
+                "https://api.openai.com/v1".to_string()
+            } else {
+                base_url
+            };
 
-            let api_key = Input::new()
+            let api_key: String = Input::new()
                 .with_prompt("API key")
                 .interact()
                 .map_err(|e| PromptBridgeError::Config(format!("Interactive prompt failed: {}", e)))?;
 
-            let model = Input::new()
+            println!("Default: gpt-4o-mini");
+            let model: String = Input::new()
                 .with_prompt("Model name")
-                .default("gpt-4o-mini".to_string())
                 .interact()
                 .map_err(|e| PromptBridgeError::Config(format!("Interactive prompt failed: {}", e)))?;
+            let model = if model.is_empty() {
+                "gpt-4o-mini".to_string()
+            } else {
+                model
+            };
             
             let provider_config = ProviderConfig {
                 provider_type: "openai".to_string(),
@@ -322,20 +342,30 @@ fn init_config_interactive() -> Result<()> {
     }
     
     // Target language
-    let target_lang = Input::new()
+    println!("Default: en");
+    let target_lang: String = Input::new()
         .with_prompt("Target language for translation")
-        .default("en".to_string())
         .interact()
         .map_err(|e| PromptBridgeError::Config(format!("Interactive prompt failed: {}", e)))?;
+    let target_lang = if target_lang.is_empty() {
+        "en".to_string()
+    } else {
+        target_lang
+    };
 
     config.general.target_language = target_lang;
 
     // Keep-alive interval
+    println!("Default: 60");
     let keep_alive: String = Input::new()
         .with_prompt("Keep-alive interval in minutes (0 to disable)")
-        .default("60".to_string())
         .interact()
         .map_err(|e| PromptBridgeError::Config(format!("Interactive prompt failed: {}", e)))?;
+    let keep_alive = if keep_alive.is_empty() {
+        "60".to_string()
+    } else {
+        keep_alive
+    };
     
     config.general.keep_alive_interval_minutes = Some(keep_alive.parse::<u64>().unwrap_or(60));
     
