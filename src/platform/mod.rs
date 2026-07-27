@@ -106,17 +106,40 @@ pub fn get_platform_dialog() -> Box<dyn PlatformDialog> {
     {
         Box::new(linux::LinuxPlatform::new())
     }
-    
+
     #[cfg(target_os = "windows")]
     {
         Box::new(windows::WindowsPlatform::new())
     }
-    
+
     #[cfg(target_os = "macos")]
     {
         Box::new(macos::MacosPlatform::new())
     }
-    
+
+    #[cfg(not(any(target_os = "linux", target_os = "windows", target_os = "macos")))]
+    {
+        compile_error!("Unsupported platform");
+    }
+}
+
+/// Get the platform-specific notification implementation
+pub fn get_platform_notifier() -> Box<dyn PlatformNotifier> {
+    #[cfg(target_os = "linux")]
+    {
+        Box::new(linux::LinuxPlatform::new())
+    }
+
+    #[cfg(target_os = "windows")]
+    {
+        Box::new(windows::WindowsPlatform::new())
+    }
+
+    #[cfg(target_os = "macos")]
+    {
+        Box::new(macos::MacosPlatform::new())
+    }
+
     #[cfg(not(any(target_os = "linux", target_os = "windows", target_os = "macos")))]
     {
         compile_error!("Unsupported platform");

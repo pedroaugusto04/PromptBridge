@@ -6,7 +6,7 @@ use promptbridge::exec::ExecGateway;
 use promptbridge::messages::{
     format_provider_list_item, MSG_INPUT_PROMPT_EMPTY,
 };
-use promptbridge::platform::{get_platform, get_platform_dialog};
+use promptbridge::platform::{get_platform, get_platform_dialog, get_platform_notifier};
 use promptbridge::providers::{LlmProvider, ProviderFactory};
 use promptbridge::utils::clipboard::copy_to_clipboard;
 use promptbridge::utils::error::{PromptBridgeError, Result};
@@ -175,6 +175,10 @@ async fn process_single_prompt(
         return Err(PromptBridgeError::Engine(MSG_INPUT_PROMPT_EMPTY.to_string()));
     }
 
+    // Show loading notification
+    let notifier = get_platform_notifier();
+    let _ = notifier.show_notification("PromptBridge", "Translating...");
+
     let provider_name = override_provider
         .as_deref()
         .unwrap_or(&config.general.default_provider);
@@ -205,6 +209,9 @@ async fn process_single_prompt(
 
     if copy || config.general.auto_copy_clipboard {
         copy_to_clipboard(&result.final_prompt)?;
+        let _ = notifier.show_notification("PromptBridge", "Translation copied to clipboard");
+    } else {
+        let _ = notifier.show_notification("PromptBridge", "Translation completed");
     }
 
     Ok(())
