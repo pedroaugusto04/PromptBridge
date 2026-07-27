@@ -169,6 +169,10 @@ target_language = "en"
 # Timeout for requests in seconds (increase if model is slow to start/respond)
 request_timeout_seconds = 60
 
+# Keep Ollama model loaded in memory for this many minutes (prevents cold starts)
+# Set to 0 to disable, or increase for longer keep-alive periods
+keep_alive_interval_minutes = 60
+
 # Automatically copy the translated prompt to the system clipboard
 auto_copy_clipboard = true
 

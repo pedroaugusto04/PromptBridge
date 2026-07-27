@@ -18,6 +18,10 @@ auto_copy_clipboard = false
 # Enable strict preservation of technical terms (code blocks, paths, logs, commands)
 preserve_technical_terms = true
 
+# Keep Ollama model loaded in memory for this many minutes (prevents cold starts)
+# Set to 0 to disable, or increase for longer keep-alive periods
+keep_alive_interval_minutes = 60
+
 [providers.ollama]
 type = "ollama"
 base_url = "https://pedro-duarte.ddns.net/ollama"
