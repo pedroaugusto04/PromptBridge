@@ -3,6 +3,7 @@ use crate::providers::LlmProvider;
 use crate::utils::error::{PromptBridgeError, Result};
 use async_trait::async_trait;
 use reqwest::Client;
+use serde_json::Value;
 
 pub struct GoogleTranslateProvider {
     client: Client,
@@ -29,9 +30,6 @@ impl GoogleTranslateProvider {
 }
 
 
-// Google Translate free API returns a nested array structure:
-// [[["translated", "original", null, 5], ...], null, "target_lang", ...]
-type GoogleTranslateResponse = Vec<Vec<Vec<String>>>;
 
 #[async_trait]
 impl LlmProvider for GoogleTranslateProvider {
@@ -118,21 +116,39 @@ impl LlmProvider for GoogleTranslateProvider {
         })?;
 
         // Parse the JSON response (Google Translate returns nested array structure)
-        let response: GoogleTranslateResponse = serde_json::from_str(&response_text)
+        // Use Value to handle complex structure with nulls
+        let response: Value = serde_json::from_str(&response_text)
             .map_err(|e| PromptBridgeError::Provider {
                 provider: "GoogleTranslate".to_string(),
                 message: format!("Failed to parse Google Translate response: {}", e),
             })?;
 
         // Extract translated text from the nested array structure
-        // Format: [[["translated", "original", null, 5], ...], ...]
+        // Format: [[["translated", "original", null, 5], ...], null, "target_lang", ...]
         let translated_text = if let Some(first_level) = response.get(0) {
-            first_level
-                .iter()
-                .filter_map(|sentence| sentence.first())
-                .cloned()
-                .collect::<Vec<String>>()
-                .join("")
+            if let Some(array) = first_level.as_array() {
+                array
+                    .iter()
+                    .filter_map(|sentence| {
+                        // Each sentence is an array where first element is translated text
+                        if let Some(sentence_array) = sentence.as_array() {
+                            if let Some(translated) = sentence_array.get(0) {
+                                translated.as_str()
+                            } else {
+                                None
+                            }
+                        } else {
+                            None
+                        }
+                    })
+                    .collect::<Vec<&str>>()
+                    .join("")
+            } else {
+                return Err(PromptBridgeError::Provider {
+                    provider: "GoogleTranslate".to_string(),
+                    message: "Invalid response structure from Google Translate".to_string(),
+                });
+            }
         } else {
             return Err(PromptBridgeError::Provider {
                 provider: "GoogleTranslate".to_string(),
