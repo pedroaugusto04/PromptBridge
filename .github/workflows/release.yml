@@ -17,6 +17,11 @@ jobs:
             artifact_name: promptbridge-linux-amd64
             asset_name: promptbridge-x86_64-unknown-linux-gnu.tar.gz
 
+          - os: ubuntu-latest
+            target: aarch64-unknown-linux-gnu
+            artifact_name: promptbridge-linux-arm64
+            asset_name: promptbridge-aarch64-unknown-linux-gnu.tar.gz
+
           - os: windows-latest
             target: x86_64-pc-windows-msvc
             artifact_name: promptbridge.exe
@@ -26,6 +31,11 @@ jobs:
             target: aarch64-apple-darwin
             artifact_name: promptbridge-macos-arm64
             asset_name: promptbridge-aarch64-apple-darwin.tar.gz
+
+          - os: macos-latest
+            target: x86_64-apple-darwin
+            artifact_name: promptbridge-macos-amd64
+            asset_name: promptbridge-x86_64-apple-darwin.tar.gz
 
     steps:
       - name: Checkout repository

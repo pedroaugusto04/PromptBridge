@@ -6,12 +6,45 @@ A quick CLI tool that translates coding prompts from your native language (e.g.,
 
 ## Installation
 
-### Linux
+### Quick Install (Recommended)
 
-### Step 1: Install Rust & Cargo
-If you don't have Rust installed, install it first via [rustup](https://rustup.rs/):
+**Linux/macOS:**
 ```bash
+curl -sSL https://raw.githubusercontent.com/pedroaugusto04/PromptBridge/main/install.sh | sh
+```
+
+**Windows (PowerShell):**
+```powershell
+irm https://raw.githubusercontent.com/pedroaugusto04/PromptBridge/main/install.ps1 | iex
+```
+
+This will automatically:
+- Download the latest binary for your platform
+- Install it to the appropriate directory
+- Set up the default configuration file
+- Add the installation directory to your PATH (if needed)
+
+### Manual Installation
+
+#### Linux
+
+**Option 1: Using Cargo (requires Rust)**
+```bash
+# Install Rust if needed
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+
+# Install PromptBridge
+cargo install promptbridge
+```
+
+**Option 2: Download Pre-compiled Binary**
+```bash
+# Download the latest release
+wget https://github.com/pedroaugusto04/PromptBridge/releases/latest/download/promptbridge-x86_64-unknown-linux-gnu.tar.gz
+
+# Extract and install
+tar -xzf promptbridge-x86_64-unknown-linux-gnu.tar.gz
+sudo mv promptbridge /usr/local/bin/
 ```
 
 ### Step 2: Install dependencies (Linux)
@@ -20,12 +53,7 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 sudo apt install xclip xdotool zenity -y
 ```
 
-### Step 3: Install PromptBridge
-```bash
-cargo install promptbridge
-```
-
-### Step 4: Run the Auto-Installer
+### Step 3: Run the Auto-Installer
 To generate the translation keyboard shortcut runner and default configuration, run:
 ```bash
 promptbridge install-shortcut
@@ -33,7 +61,7 @@ promptbridge install-shortcut
 
 > **Important**: This command creates your global configuration file at `~/.config/promptbridge/promptbridge.toml`. Make sure to open this file and configure your AI provider (e.g., set your OpenAI API key or custom Ollama URL)
 
-### Step 5: Configure the System Hotkey
+### Step 4: Configure the System Hotkey
 * Open your system **Settings** -> **Keyboard** -> **Keyboard Shortcuts** -> **Custom Shortcuts (+)**.
 * Create a new shortcut:
   * **Name**: `PromptBridge Translate`
@@ -42,20 +70,26 @@ promptbridge install-shortcut
 
 ### Windows
 
-#### Step 1: Install Rust & Cargo
-If you don't have Rust installed, install it first via [rustup](https://rustup.rs/):
+**Option 1: Using Cargo (requires Rust)**
 ```powershell
-# In PowerShell
+# Install Rust if needed
 Invoke-WebRequest -Uri https://win.rustup.rs/x86_64 -OutFile rustup-init.exe
 .\rustup-init.exe
-```
 
-#### Step 2: Install PromptBridge
-```powershell
+# Install PromptBridge
 cargo install promptbridge
 ```
 
-#### Step 3: Run the Auto-Installer
+**Option 2: Download Pre-compiled Binary**
+```powershell
+# Download the latest release
+Invoke-WebRequest -Uri "https://github.com/pedroaugusto04/PromptBridge/releases/latest/download/promptbridge-x86_64-pc-windows-msvc.zip" -OutFile promptbridge.zip
+
+# Extract and add to PATH
+Expand-Archive -Path promptbridge.zip -DestinationPath $env:USERPROFILE\.cargo\bin
+```
+
+#### Step 2: Run the Auto-Installer
 To generate the translation keyboard shortcut runner and default configuration, run:
 ```powershell
 promptbridge install-shortcut
@@ -63,7 +97,7 @@ promptbridge install-shortcut
 
 > **Important**: This command creates your global configuration file at `%APPDATA%\promptbridge\promptbridge.toml`. Make sure to open this file and configure your AI provider (e.g., set your OpenAI API key or custom Ollama URL)
 
-#### Step 4: Configure the System Hotkey
+#### Step 3: Configure the System Hotkey
 Windows requires additional setup for global hotkeys. Choose one of the following methods:
 
 **Option A: Using AutoHotkey (Recommended)**
@@ -84,18 +118,29 @@ return
 
 ### macOS
 
-#### Step 1: Install Rust & Cargo
-If you don't have Rust installed, install it first via [rustup](https://rustup.rs/):
+**Option 1: Using Cargo (requires Rust)**
 ```bash
+# Install Rust if needed
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-```
 
-#### Step 2: Install PromptBridge
-```bash
+# Install PromptBridge
 cargo install promptbridge
 ```
 
-#### Step 3: Run the Auto-Installer
+**Option 2: Download Pre-compiled Binary**
+```bash
+# For Apple Silicon (M1/M2/M3)
+wget https://github.com/pedroaugusto04/PromptBridge/releases/latest/download/promptbridge-aarch64-apple-darwin.tar.gz
+
+# For Intel Macs
+wget https://github.com/pedroaugusto04/PromptBridge/releases/latest/download/promptbridge-x86_64-apple-darwin.tar.gz
+
+# Extract and install
+tar -xzf promptbridge-*.tar.gz
+sudo mv promptbridge /usr/local/bin/
+```
+
+#### Step 2: Run the Auto-Installer
 To generate the translation keyboard shortcut runner and default configuration, run:
 ```bash
 promptbridge install-shortcut
@@ -103,7 +148,7 @@ promptbridge install-shortcut
 
 > **Important**: This command creates your global configuration file at `~/Library/Application Support/promptbridge/promptbridge.toml`. Make sure to open this file and configure your AI provider (e.g., set your OpenAI API key or custom Ollama URL)
 
-#### Step 4: Configure the System Hotkey
+#### Step 3: Configure the System Hotkey
 macOS requires using Automator to create a Quick Action:
 
 1. Open **Automator** (Applications -> Automator)
