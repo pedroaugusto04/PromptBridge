@@ -38,9 +38,18 @@ fi
 TMP_DIR=$(mktemp -d)
 trap "rm -rf $TMP_DIR" EXIT
 
+# Get latest release version
+echo "Checking for latest release..."
+LATEST_VERSION=$(curl -s https://api.github.com/repos/pedroaugusto04/PromptBridge/releases/latest | grep '"tag_name"' | cut -d'"' -f4)
+if [[ -z "$LATEST_VERSION" ]]; then
+    echo "❌ Failed to get latest release version"
+    exit 1
+fi
+echo "Latest version: $LATEST_VERSION"
+
 # Download latest release
 echo "Downloading PromptBridge $BINARY..."
-LATEST_URL="https://github.com/pedroaugusto04/PromptBridge/releases/download/v0.2.3/${BINARY}.tar.gz"
+LATEST_URL="https://github.com/pedroaugusto04/PromptBridge/releases/download/${LATEST_VERSION}/${BINARY}.tar.gz"
 echo "Downloading from: $LATEST_URL"
 if ! curl -fSL "$LATEST_URL" -o "$TMP_DIR/promptbridge.tar.gz"; then
     echo "❌ Failed to download binary from: $LATEST_URL"
@@ -92,7 +101,7 @@ if [[ ! -f "$CONFIG_DIR/promptbridge.toml" ]]; then
     echo "Creating default configuration..."
     curl -fsSL "https://raw.githubusercontent.com/pedroaugusto04/PromptBridge/main/promptbridge.example.toml" -o "$CONFIG_DIR/promptbridge.toml"
 else
-    echo "ℹConfiguration already exists, skipping..."
+    echo "Configuration already exists, skipping..."
 fi
 
 # Add to PATH if needed

@@ -12,9 +12,18 @@ $tmpDir = Join-Path $env:TEMP "promptbridge-install"
 New-Item -ItemType Directory -Path $tmpDir -Force | Out-Null
 
 try {
+    # Get latest release version
+    Write-Host "Checking for latest release..." -ForegroundColor Cyan
+    $latestVersion = (Invoke-RestMethod -Uri "https://api.github.com/repos/pedroaugusto04/PromptBridge/releases/latest").tag_name
+    if (-not $latestVersion) {
+        Write-Host "Failed to get latest release version" -ForegroundColor Red
+        exit 1
+    }
+    Write-Host "Latest version: $latestVersion" -ForegroundColor Green
+
     # Download latest release
     Write-Host "Downloading PromptBridge $binary..." -ForegroundColor Cyan
-    $latestUrl = "https://github.com/pedroaugusto04/PromptBridge/releases/download/v0.2.3/${binary}"
+    $latestUrl = "https://github.com/pedroaugusto04/PromptBridge/releases/download/${latestVersion}/${binary}"
     $zipPath = Join-Path $tmpDir "promptbridge.zip"
     
     try {
