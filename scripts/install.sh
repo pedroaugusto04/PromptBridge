@@ -104,20 +104,22 @@ else
     echo "Configuration already exists, skipping..."
 fi
 
+# Detect shell for instructions
+SHELL_NAME=$(basename "$SHELL")
+if [ "$SHELL_NAME" = "bash" ]; then
+    CONFIG_FILE="$HOME/.bashrc"
+elif [ "$SHELL_NAME" = "zsh" ]; then
+    CONFIG_FILE="$HOME/.zshrc"
+else
+    CONFIG_FILE="$HOME/.profile"
+fi
+
 # Add to PATH if needed
-case ":$PATH:" in *":$INSTALL_DIR:"*) ;; *)
+NEED_SOURCE=false
+case ":$PATH:" in *":$INSTALL_DIR:"*) ;;
+    *)
     echo ""
     echo "Adding $INSTALL_DIR to PATH..."
-    
-    # Detect shell and add to appropriate config file
-    SHELL_NAME=$(basename "$SHELL")
-    if [ "$SHELL_NAME" = "bash" ]; then
-        CONFIG_FILE="$HOME/.bashrc"
-    elif [ "$SHELL_NAME" = "zsh" ]; then
-        CONFIG_FILE="$HOME/.zshrc"
-    else
-        CONFIG_FILE="$HOME/.profile"
-    fi
     
     # Add PATH export if not already present
     if ! grep -q "export PATH=\"$INSTALL_DIR" "$CONFIG_FILE" 2>/dev/null; then
@@ -125,20 +127,22 @@ case ":$PATH:" in *":$INSTALL_DIR:"*) ;; *)
         echo "# PromptBridge" >> "$CONFIG_FILE"
         echo "export PATH=\"$INSTALL_DIR:\$PATH\"" >> "$CONFIG_FILE"
         echo "Added to PATH in $CONFIG_FILE"
+        NEED_SOURCE=true
     else
         echo "Already in PATH configuration"
     fi
-    
-    echo ""
-    echo "Please restart your terminal or run:"
-    echo "   source $CONFIG_FILE"
-;; esac
+    ;;
+esac
 
 echo ""
-echo "✅ PromptBridge installed successfully!"
+echo "PromptBridge installed successfully!"
 echo ""
 echo "Next steps:"
-echo "   1. Restart your terminal or run: source $CONFIG_FILE"
+if [ "$NEED_SOURCE" = true ]; then
+    echo "   1. Restart your terminal or run: source $CONFIG_FILE"
+else
+    echo "   1. Restart your terminal"
+fi
 echo "   2. Verify installation: promptbridge --version"
 echo "   3. Configure keyboard shortcut: promptbridge install-shortcut"
 echo ""
