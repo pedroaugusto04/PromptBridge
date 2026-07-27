@@ -4,12 +4,12 @@ use promptbridge::config::Config;
 use promptbridge::engine::{TransformMode, TransformationPipeline};
 use promptbridge::exec::ExecGateway;
 use promptbridge::messages::{
-    format_provider_list_item, MSG_INPUT_PROMPT_EMPTY, MSG_PROMPT_COPIED_CLIPBOARD,
+    format_provider_list_item, MSG_INPUT_PROMPT_EMPTY,
 };
 use promptbridge::providers::{LlmProvider, ProviderFactory};
 use promptbridge::utils::clipboard::copy_to_clipboard;
 use promptbridge::utils::error::{PromptBridgeError, Result};
-use promptbridge::utils::formatting::{format_diff, print_error, print_success};
+use promptbridge::utils::formatting::{format_diff, print_error};
 use std::io::{self, Read};
 
 #[tokio::main]
@@ -297,7 +297,6 @@ async fn process_single_prompt(
 
     if copy || config.general.auto_copy_clipboard {
         copy_to_clipboard(&result.final_prompt)?;
-        print_success(MSG_PROMPT_COPIED_CLIPBOARD);
     }
 
     Ok(())
