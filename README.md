@@ -4,6 +4,14 @@ A quick tool that translates coding prompts from your native language (e.g., Por
 
 ---
 
+## Why?
+
+**Save money on LLM costs.** English prompts use significantly fewer tokens than other languages:
+
+LLMs are trained primarily on English text, so they tokenize English much more efficiently. Writing prompts in your native language and translating them to English before sending to the AI can reduce your token costs while maintaining technical accuracy.
+
+---
+
 ## Installation
 
 ### Quick Install (Recommended)
