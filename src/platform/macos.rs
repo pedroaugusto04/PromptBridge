@@ -12,7 +12,6 @@ use crate::platform::{
     ProgressDialogHandle, ShortcutInstallResult, TextInfoResult,
 };
 use crate::utils::error::{PromptBridgeError, Result};
-use std::io::Write;
 use std::process::{Command, Stdio};
 use std::sync::{Arc, Mutex};
 
@@ -164,7 +163,7 @@ impl PlatformDialog for MacosPlatform {
     fn show_progress(&self, title: &str, text: &str) -> Result<Box<dyn ProgressDialogHandle>> {
         let applescript = format!(
             r#"tell application "System Events"
-                display dialog "{}" with title "{}" buttons {"OK"} default button "OK" giving up after 3600
+                display dialog "{}" with title "{}" buttons {{"OK"}} default button "OK" giving up after 3600
             end tell"#,
             text, title
         );
@@ -184,7 +183,7 @@ impl PlatformDialog for MacosPlatform {
     fn show_text_info(&self, title: &str, text: &str) -> Result<TextInfoResult> {
         let applescript = format!(
             r#"tell application "System Events"
-                set result to button returned of (display dialog "{}" with title "{}" buttons {"Copy", "Done"} default button "Copy" with icon note)
+                set result to button returned of (display dialog "{}" with title "{}" buttons {{"Copy", "Done"}} default button "Copy" with icon note)
             end tell"#,
             text.replace('"', r#"\\""#), title
         );
@@ -205,7 +204,7 @@ impl PlatformDialog for MacosPlatform {
     fn show_error(&self, title: &str, text: &str) -> Result<()> {
         let applescript = format!(
             r#"tell application "System Events"
-                display dialog "{}" with title "{}" buttons {"OK"} with icon stop
+                display dialog "{}" with title "{}" buttons {{"OK"}} with icon stop
             end tell"#,
             text.replace('"', r#"\\""#), title
         );
