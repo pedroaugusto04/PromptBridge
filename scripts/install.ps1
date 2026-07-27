@@ -29,7 +29,7 @@ try {
     try {
         Invoke-WebRequest -Uri $latestUrl -OutFile $zipPath -UseBasicParsing
     } catch {
-        Write-Host "❌ Failed to download binary. Please check your internet connection." -ForegroundColor Red
+        Write-Host "Failed to download binary. Please check your internet connection." -ForegroundColor Red
         exit 1
     }
 
@@ -67,7 +67,7 @@ try {
         try {
             Invoke-WebRequest -Uri $exampleUrl -OutFile $configPath -UseBasicParsing
         } catch {
-            Write-Host "⚠️  Failed to download example config. You'll need to create it manually." -ForegroundColor Yellow
+            Write-Host "Failed to download example config. You'll need to create it manually." -ForegroundColor Yellow
         }
     } else {
         Write-Host "Configuration already exists, skipping..." -ForegroundColor Yellow
@@ -77,14 +77,14 @@ try {
     $currentPath = [Environment]::GetEnvironmentVariable("Path", "User")
     if ($currentPath -notlike "*$installDir*") {
         Write-Host ""
-        Write-Host "⚠️  $installDir is not in your PATH." -ForegroundColor Yellow
+        Write-Host "$installDir is not in your PATH." -ForegroundColor Yellow
         Write-Host "   Adding to PATH..." -ForegroundColor Cyan
         [Environment]::SetEnvironmentVariable("Path", "$currentPath;$installDir", "User")
         Write-Host "   PATH updated. You may need to restart your terminal." -ForegroundColor Green
     }
 
     Write-Host ""
-    Write-Host "✅ PromptBridge installed successfully!" -ForegroundColor Green
+    Write-Host "PromptBridge installed successfully!" -ForegroundColor Green
     Write-Host ""
     Write-Host "Next steps:" -ForegroundColor Cyan
     Write-Host "   1. Restart your terminal or refresh your PATH"
