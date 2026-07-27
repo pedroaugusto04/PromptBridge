@@ -81,13 +81,16 @@ pub const REGEX_FILE_PATH: &str = r#"(?i)\b(?:[a-z]:\\|/|\./|\.\./|[a-z0-9_.-]+/
 /// Default configuration template
 pub const DEFAULT_CONFIG_TOML: &str = r#"
 [general]
-default_provider = "ollama"
+default_provider = "google_translate"
 target_language = "en"
 mode = "preview"
 auto_copy_clipboard = true
 preserve_technical_terms = true
 request_timeout_seconds = 60
 keep_alive_interval_minutes = 60
+
+[providers.google_translate]
+type = "google_translate"
 
 [providers.ollama]
 type = "ollama"

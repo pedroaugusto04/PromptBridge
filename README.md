@@ -34,10 +34,12 @@ promptbridge init-config
 ```
 
 This interactive wizard will guide you through:
-- Selecting your LLM provider (Ollama, OpenAI, or Mock)
+- Selecting your translation provider (Google Translate, Ollama, OpenAI, or Mock)
 - Configuring provider-specific settings (URL, model, API keys)
 - Setting your target language
 - Configuring keep-alive interval
+
+**Note:** Google Translate is the default provider and requires no configuration - it's free and works out of the box.
 
 **2. Install the keyboard shortcut helper:**
 ```bash
@@ -103,8 +105,8 @@ nano ~/Library/Application\ Support/promptbridge/promptbridge.toml
 
 ```toml
 [general]
-# The active provider to use ("ollama", "openai", "deepseek", or "mock")
-default_provider = "ollama"
+# The active provider to use ("google_translate", "ollama", "openai", or "mock")
+default_provider = "google_translate"
 
 # Target language for translation (e.g., "en", "es", "fr", "pt")
 target_language = "en"
@@ -122,6 +124,9 @@ auto_copy_clipboard = true
 # Safely extract and preserve paths/code during translation
 preserve_technical_terms = true
 
+[providers.google_translate]
+type = "google_translate"
+
 [providers.ollama]
 type = "ollama"
 base_url = "http://localhost:11434"
@@ -132,7 +137,7 @@ temperature = 0
 [providers.openai]
 type = "openai"
 base_url = "https://api.openai.com/v1"
-api_key = "env:OPENAI_API_KEY"  
+api_key = "env:OPENAI_API_KEY"
 model = "gpt-4o-mini"
 temperature = 0.2
 ```

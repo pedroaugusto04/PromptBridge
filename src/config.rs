@@ -29,7 +29,7 @@ pub struct GeneralConfig {
 impl Default for GeneralConfig {
     fn default() -> Self {
         Self {
-            default_provider: "ollama".to_string(),
+            default_provider: "google_translate".to_string(),
             target_language: DEFAULT_TARGET_LANGUAGE.to_string(),
             mode: "preview".to_string(),
             auto_copy_clipboard: true,

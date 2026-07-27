@@ -1,3 +1,4 @@
+pub mod google_translate;
 pub mod mock;
 pub mod ollama;
 pub mod openai;
@@ -22,6 +23,7 @@ pub struct ProviderFactory;
 impl ProviderFactory {
     pub fn create(config: &ProviderConfig, keep_alive_minutes: Option<u64>) -> Result<Box<dyn LlmProvider>> {
         match config.provider_type.as_str() {
+            "google_translate" | "google-translate" => Ok(Box::new(google_translate::GoogleTranslateProvider::new()?)),
             "ollama" => Ok(Box::new(ollama::OllamaProvider::new(
                 config.base_url.clone(),
                 config.model.clone(),
@@ -37,7 +39,7 @@ impl ProviderFactory {
             )?)),
             "mock" => Ok(Box::new(mock::MockProvider::new(config.model.clone()))),
             unknown => Err(PromptBridgeError::Config(format!(
-                "Unknown provider type '{}'. Supported: 'ollama', 'openai', 'mock'",
+                "Unknown provider type '{}'. Supported: 'google_translate', 'ollama', 'openai', 'mock'",
                 unknown
             ))),
         }
