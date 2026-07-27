@@ -42,8 +42,9 @@ trap "rm -rf $TMP_DIR" EXIT
 echo "Checking for latest release..."
 LATEST_VERSION=$(curl -s https://api.github.com/repos/pedroaugusto04/PromptBridge/releases/latest | grep '"tag_name"' | cut -d'"' -f4)
 if [ -z "$LATEST_VERSION" ]; then
-    echo "❌ Failed to get latest release version"
-    exit 1
+    echo "Warning: Could not fetch latest version from GitHub API (rate limited)"
+    echo "Using fallback version: v0.2.3"
+    LATEST_VERSION="v0.2.3"
 fi
 echo "Latest version: $LATEST_VERSION"
 
@@ -52,7 +53,7 @@ echo "Downloading PromptBridge $BINARY..."
 LATEST_URL="https://github.com/pedroaugusto04/PromptBridge/releases/download/${LATEST_VERSION}/${BINARY}.tar.gz"
 echo "Downloading from: $LATEST_URL"
 if ! curl -fSL "$LATEST_URL" -o "$TMP_DIR/promptbridge.tar.gz"; then
-    echo "❌ Failed to download binary from: $LATEST_URL"
+    echo "Failed to download binary from: $LATEST_URL"
     echo "   Please check if the release exists at:"
     echo "   https://github.com/pedroaugusto04/PromptBridge/releases"
     exit 1
