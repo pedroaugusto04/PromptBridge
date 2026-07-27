@@ -18,197 +18,66 @@ curl -sSL https://raw.githubusercontent.com/pedroaugusto04/PromptBridge/main/ins
 irm https://raw.githubusercontent.com/pedroaugusto04/PromptBridge/main/install.ps1 | iex
 ```
 
-This will automatically:
-- Download the latest binary for your platform
-- Install it to the appropriate directory
-- Set up the default configuration file
-- Add the installation directory to your PATH (if needed)
+### Setup
 
-### Manual Installation
-
-#### Linux
-
-**Option 1: Using Cargo (requires Rust)**
-```bash
-# Install Rust if needed
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-
-# Install PromptBridge
-cargo install promptbridge
-```
-
-**Option 2: Download Pre-compiled Binary**
-```bash
-# Download the latest release
-wget https://github.com/pedroaugusto04/PromptBridge/releases/latest/download/promptbridge-x86_64-unknown-linux-gnu.tar.gz
-
-# Extract and install
-tar -xzf promptbridge-x86_64-unknown-linux-gnu.tar.gz
-sudo mv promptbridge /usr/local/bin/
-```
-
-### Step 2: Install dependencies (Linux)
-*Required for clipboard access, keystroke simulation, and visual feedback dialogs.*
-```bash
-sudo apt install xclip xdotool zenity -y
-```
-
-### Step 3: Configure (Interactive)
-Run the interactive configuration wizard to set up your AI provider:
+**1. Configure your AI provider:**
 ```bash
 promptbridge init-config
 ```
 
-This will guide you through:
+This interactive wizard will guide you through:
 - Selecting your LLM provider (Ollama, OpenAI, or Mock)
 - Configuring provider-specific settings (URL, model, API keys)
 - Setting your target language
 - Configuring keep-alive interval
 
-Alternatively, you can manually edit the configuration file after running the shortcut installer.
-
-### Step 4: Run the Auto-Installer
-To generate the translation keyboard shortcut runner, run:
+**2. Install the keyboard shortcut helper:**
 ```bash
 promptbridge install-shortcut
 ```
 
-> **Important**: This creates your global configuration file at `~/.config/promptbridge/promptbridge.toml`. If you didn't run `init-config`, make sure to open this file and configure your AI provider (e.g., set your OpenAI API key or custom Ollama URL)
+**3. Configure the system hotkey:**
 
-### Step 5: Configure the System Hotkey
-* Open your system **Settings** -> **Keyboard** -> **Keyboard Shortcuts** -> **Custom Shortcuts (+)**.
-* Create a new shortcut:
-  * **Name**: `PromptBridge Translate`
-  * **Command**: `pb-translate`
-  * **Shortcut**: Set your preferred key combination (e.g., `Ctrl+Alt+T` or `Super+T`).
+**Linux:**
+- Open **Settings** → **Keyboard** → **Keyboard Shortcuts** → **Custom Shortcuts (+)**
+- Name: `PromptBridge Translate`
+- Command: `pb-translate`
+- Shortcut: Set your preferred key combination (e.g., `Ctrl+Alt+T`)
 
-### Windows
-
-**Option 1: Using Cargo (requires Rust)**
-```powershell
-# Install Rust if needed
-Invoke-WebRequest -Uri https://win.rustup.rs/x86_64 -OutFile rustup-init.exe
-.\rustup-init.exe
-
-# Install PromptBridge
-cargo install promptbridge
-```
-
-**Option 2: Download Pre-compiled Binary**
-```powershell
-# Download the latest release
-Invoke-WebRequest -Uri "https://github.com/pedroaugusto04/PromptBridge/releases/latest/download/promptbridge-x86_64-pc-windows-msvc.zip" -OutFile promptbridge.zip
-
-# Extract and add to PATH
-Expand-Archive -Path promptbridge.zip -DestinationPath $env:USERPROFILE\.cargo\bin
-```
-
-#### Step 2: Configure (Interactive)
-Run the interactive configuration wizard to set up your AI provider:
-```powershell
-promptbridge init-config
-```
-
-This will guide you through:
-- Selecting your LLM provider (Ollama, OpenAI, or Mock)
-- Configuring provider-specific settings (URL, model, API keys)
-- Setting your target language
-- Configuring keep-alive interval
-
-Alternatively, you can manually edit the configuration file after running the shortcut installer.
-
-#### Step 3: Run the Auto-Installer
-To generate the translation keyboard shortcut runner, run:
-```powershell
-promptbridge install-shortcut
-```
-
-> **Important**: This creates your global configuration file at `%APPDATA%\promptbridge\promptbridge.toml`. If you didn't run `init-config`, make sure to open this file and configure your AI provider (e.g., set your OpenAI API key or custom Ollama URL)
-
-#### Step 4: Configure the System Hotkey
-Windows requires additional setup for global hotkeys. Choose one of the following methods:
-
-**Option A: Using AutoHotkey (Recommended)**
-1. Install [AutoHotkey](https://www.autohotkey.com/)
-2. Create an AutoHotkey script with:
+**Windows:**
+- Install [AutoHotkey](https://www.autohotkey.com/)
+- Create a script with:
 ```autohotkey
 ^t::  ; Ctrl+T
 Run, PowerShell.exe -ExecutionPolicy Bypass -File "%APPDATA%\promptbridge\pb-translate.ps1"
 return
 ```
-3. Save as `promptbridge.ahk` and run it
 
-**Option B: Using PowerShell Shortcut**
-1. Create a shortcut on your desktop
-2. Set target to: `powershell.exe -ExecutionPolicy Bypass -File "%APPDATA%\promptbridge\pb-translate.ps1"`
-3. Right-click shortcut -> Properties -> Shortcut Key
-4. Set your preferred key combination (e.g., `Ctrl+Alt+T`)
+**macOS:**
+- Open **Automator** → **Quick Action**
+- Add **Run Shell Script** with: `pb-translate "$@"`
+- Set keyboard shortcut in **System Settings** → **Keyboard** → **Keyboard Shortcuts** → **Services**
 
-### macOS
+### Manual Installation
 
-**Option 1: Using Cargo (requires Rust)**
+If you prefer manual installation or need Rust-specific installation:
+
+**Using Cargo:**
 ```bash
-# Install Rust if needed
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-
-# Install PromptBridge
 cargo install promptbridge
 ```
 
-**Option 2: Download Pre-compiled Binary**
+**Download Pre-compiled Binaries:**
+- [Linux x86_64](https://github.com/pedroaugusto04/PromptBridge/releases/latest/download/promptbridge-x86_64-unknown-linux-gnu.tar.gz)
+- [Linux ARM64](https://github.com/pedroaugusto04/PromptBridge/releases/latest/download/promptbridge-aarch64-unknown-linux-gnu.tar.gz)
+- [Windows x86_64](https://github.com/pedroaugusto04/PromptBridge/releases/latest/download/promptbridge-x86_64-pc-windows-msvc.zip)
+- [macOS Apple Silicon](https://github.com/pedroaugusto04/PromptBridge/releases/latest/download/promptbridge-aarch64-apple-darwin.tar.gz)
+- [macOS Intel](https://github.com/pedroaugusto04/PromptBridge/releases/latest/download/promptbridge-x86_64-apple-darwin.tar.gz)
+
+**Linux Dependencies:**
 ```bash
-# For Apple Silicon (M1/M2/M3)
-wget https://github.com/pedroaugusto04/PromptBridge/releases/latest/download/promptbridge-aarch64-apple-darwin.tar.gz
-
-# For Intel Macs
-wget https://github.com/pedroaugusto04/PromptBridge/releases/latest/download/promptbridge-x86_64-apple-darwin.tar.gz
-
-# Extract and install
-tar -xzf promptbridge-*.tar.gz
-sudo mv promptbridge /usr/local/bin/
+sudo apt install xclip xdotool zenity -y
 ```
-
-#### Step 2: Configure (Interactive)
-Run the interactive configuration wizard to set up your AI provider:
-```bash
-promptbridge init-config
-```
-
-This will guide you through:
-- Selecting your LLM provider (Ollama, OpenAI, or Mock)
-- Configuring provider-specific settings (URL, model, API keys)
-- Setting your target language
-- Configuring keep-alive interval
-
-Alternatively, you can manually edit the configuration file after running the shortcut installer.
-
-#### Step 3: Run the Auto-Installer
-To generate the translation keyboard shortcut runner, run:
-```bash
-promptbridge install-shortcut
-```
-
-> **Important**: This creates your global configuration file at `~/Library/Application Support/promptbridge/promptbridge.toml`. If you didn't run `init-config`, make sure to open this file and configure your AI provider (e.g., set your OpenAI API key or custom Ollama URL)
-
-#### Step 4: Configure the System Hotkey
-macOS requires using Automator to create a Quick Action:
-
-1. Open **Automator** (Applications -> Automator)
-2. Choose **Quick Action** as the document type
-3. Set:
-   - Workflow receives current: **text**
-   - in: **any application**
-4. Add **Run Shell Script** action
-5. Set shell to: `/bin/bash`
-6. Set script to:
-```bash
-~/Library/Application\ Support/promptbridge/pb-translate.sh
-```
-7. Save as `PromptBridge Translate`
-8. Open **System Settings** -> **Keyboard** -> **Keyboard Shortcuts** -> **Services**
-9. Find `PromptBridge Translate` and assign your shortcut (e.g., `Ctrl+Alt+T`)
-
-> **Note**: On macOS, you need to copy text to the clipboard before pressing the hotkey, as macOS doesn't have a primary selection like Linux.
 
 ---
 
