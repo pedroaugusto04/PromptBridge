@@ -93,14 +93,14 @@ keep_alive_interval_minutes = 60
 type = "ollama"
 base_url = "http://localhost:11434"
 model = "llama3.2"
-temperature = 0.2
+temperature = 0.0
 
 [providers.openai]
 type = "openai"
 base_url = "https://api.openai.com/v1"
 api_key = "env:OPENAI_API_KEY"
 model = "gpt-4o-mini"
-temperature = 0.2
+temperature = 0.0
 
 [providers.mock]
 type = "mock"

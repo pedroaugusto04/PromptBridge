@@ -32,7 +32,7 @@ impl Default for GeneralConfig {
             default_provider: "ollama".to_string(),
             target_language: DEFAULT_TARGET_LANGUAGE.to_string(),
             mode: "preview".to_string(),
-            auto_copy_clipboard: false,
+            auto_copy_clipboard: true,
             preserve_technical_terms: true,
             keep_alive_interval_minutes: Some(60), // Default: 60 minutes
         }
