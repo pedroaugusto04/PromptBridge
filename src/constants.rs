@@ -9,6 +9,11 @@ pub const ENV_PREFIX: &str = "PROMPTBRIDGE_";
 pub const DEFAULT_OLLAMA_MODEL: &str = "llama3.2";
 pub const DEFAULT_TARGET_LANGUAGE: &str = "en";
 
+/// Security limits to prevent resource exhaustion
+pub const MAX_PROMPT_SIZE_BYTES: usize = 100_000; // 100KB
+pub const MAX_RESPONSE_SIZE_BYTES: usize = 10_000; // 10KB
+pub const MAX_EXTRACTED_ITEMS: usize = 1000; // Prevent excessive extraction
+
 /// Dynamic getters with Environment Variable overrides & fallback defaults
 
 pub fn get_ollama_base_url() -> String {

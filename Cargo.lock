@@ -1263,6 +1263,7 @@ dependencies = [
  "dirs",
  "dotenvy",
  "figment",
+ "lazy_static",
  "portable-pty",
  "pulldown-cmark",
  "regex",

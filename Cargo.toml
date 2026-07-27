@@ -1,6 +1,6 @@
 [package]
 name = "promptbridge"
-version = "0.1.15"
+version = "0.1.16"
 edition = "2021"
 authors = ["PromptBridge Contributors"]
 description = "A clean, modular, CLI-agnostic Rust proxy gateway that translates and optimizes developer prompts while preserving technical content."
@@ -29,6 +29,7 @@ async-trait = "0.1"
 # Text processing & AST parsing
 regex = "1.10"
 pulldown-cmark = "0.9"
+lazy_static = "1.4"
 
 # Terminal & PTY proxy
 portable-pty = "0.8"
