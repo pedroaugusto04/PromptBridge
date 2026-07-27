@@ -181,12 +181,14 @@ fi
 OLD_CLIP=$(xclip -selection clipboard -o 2>/dev/null)
 
 # 4. Show pulsating progress dialog while translating
-zenity --progress --pulsate --no-cancel --title="PromptBridge" --text="Translating..." --width=300 &
+zenity --progress --pulsate --no-cancel --auto-close --title="PromptBridge" --text="Translating..." --width=300 &
 ZEN_PID=$!
 
 # 5. Run translation (synchronously, capture output)
-RESULT=$(promptbridge translate "$TEXTO" 2>>"$LOGFILE")
+RAW_RESULT=$(promptbridge translate "$TEXTO" 2>>"$LOGFILE" 2>/dev/null)
 EXIT_CODE=$?
+# Filter out success messages (lines starting with ✓)
+RESULT=$(echo "$RAW_RESULT" | grep -v "^✓")
 log "Exit code: $EXIT_CODE | Result: $RESULT"
 
 # 6. Close the progress dialog
