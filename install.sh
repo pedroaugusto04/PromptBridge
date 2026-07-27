@@ -41,8 +41,11 @@ trap "rm -rf $TMP_DIR" EXIT
 # Download latest release
 echo "Downloading PromptBridge $BINARY..."
 LATEST_URL="https://github.com/pedroaugusto04/PromptBridge/releases/latest/download/${BINARY}.tar.gz"
-if ! curl -fsSL "$LATEST_URL" -o "$TMP_DIR/promptbridge.tar.gz"; then
-    echo "❌ Failed to download binary. Please check your internet connection."
+echo "Downloading from: $LATEST_URL"
+if ! curl -fSL "$LATEST_URL" -o "$TMP_DIR/promptbridge.tar.gz"; then
+    echo "❌ Failed to download binary from: $LATEST_URL"
+    echo "   Please check if the release exists at:"
+    echo "   https://github.com/pedroaugusto04/PromptBridge/releases"
     exit 1
 fi
 
