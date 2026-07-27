@@ -6,7 +6,7 @@ use std::path::PathBuf;
     name = "promptbridge",
     author = "PromptBridge Contributors",
     version = "0.2.0",
-    about = "CLI-agnostic prompt gateway: translates and optimizes developer prompts while preserving technical content."
+    about = "A quick CLI tool that translates coding prompts via global hotkey. Translated text is automatically copied to clipboard."
 )]
 pub struct Cli {
     /// Custom configuration file path

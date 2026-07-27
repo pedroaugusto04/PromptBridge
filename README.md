@@ -1,6 +1,6 @@
 # PromptBridge
 
-Translates coding prompts from your native language (e.g., Portuguese) to another language (e.g., English) in place via a global hotkey, eliminating the need to manually open a translation tab. Safely preserves all code blocks, file paths, and terminal commands during translation.
+A quick CLI tool that translates coding prompts from your native language (e.g., Portuguese) to another language (e.g., English) via a global hotkey. The translated text is automatically copied to your clipboard, ready to paste anywhere. Safely preserves all code blocks, file paths, and terminal commands during translation.
 
 ---
 
@@ -131,7 +131,9 @@ Inside **any** chat interface (terminal TUIs like `opencode`/`aider`, VS Code, o
 1. Type your prompt in your native language (e.g., `crie uma função em rust em src/main.rs`).
 2. Select/highlight the text.
 3. Press your hotkey (e.g., `Ctrl+Alt+T`).
-4. The text will be instantly translated to English with all pathnames and code blocks protected
+4. The text will be instantly translated to English with all pathnames and code blocks protected.
+5. The translated text is automatically copied to your clipboard (just like Ctrl+C).
+6. Paste the translated text wherever you need it (Ctrl+V).
 
 ---
 
