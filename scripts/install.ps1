@@ -14,10 +14,15 @@ New-Item -ItemType Directory -Path $tmpDir -Force | Out-Null
 try {
     # Get latest release version
     Write-Host "Checking for latest release..." -ForegroundColor Cyan
-    $latestVersion = (Invoke-RestMethod -Uri "https://api.github.com/repos/pedroaugusto04/PromptBridge/releases/latest").tag_name
-    if (-not $latestVersion) {
-        Write-Host "Failed to get latest release version" -ForegroundColor Red
-        exit 1
+    try {
+        $latestVersion = (Invoke-RestMethod -Uri "https://api.github.com/repos/pedroaugusto04/PromptBridge/releases/latest").tag_name
+        if (-not $latestVersion) {
+            throw "Failed to get version"
+        }
+    } catch {
+        Write-Host "Warning: Could not fetch latest version from GitHub API (rate limited)" -ForegroundColor Yellow
+        Write-Host "Using fallback version: v0.3.0" -ForegroundColor Yellow
+        $latestVersion = "v0.3.0"
     }
     Write-Host "Latest version: $latestVersion" -ForegroundColor Green
 
