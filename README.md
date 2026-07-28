@@ -38,15 +38,20 @@ The installation script automatically configures everything for you. Just config
 - Command: `pb-translate`
 - Shortcut: Set your preferred key combination (e.g., `Ctrl+Alt+T`)
 
-**Windows:**
-- Install [AutoHotkey v2](https://www.autohotkey.com/)
-- Create a script with:
+#### Windows
+
+1. Install **AutoHotkey v2**.
+2. Create a new file named `PromptBridge.ahk`.
+3. Paste the following:
+
 ```autohotkey
 ^!t::  ; Ctrl+Alt+T
 {
     Run 'PowerShell.exe -ExecutionPolicy Bypass -File "%APPDATA%\promptbridge\pb-translate.ps1"'
 }
 ```
+
+4. Double-click `PromptBridge.ahk` to start the shortcut.
 
 **macOS:**
 - Open **Automator** → **Quick Action**
