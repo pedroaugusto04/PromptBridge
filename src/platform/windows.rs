@@ -111,28 +111,20 @@ try {
             [System.Windows.Forms.Clipboard]::SetText($result)
             Log-Message "Auto-copied to clipboard"
             
-            # Show toast notification
-            Add-Type -AssemblyName Windows.Data.Xml.Dom
-            Add-Type -AssemblyName Windows.UI.Notifications
+            # Show notification
+            Add-Type -AssemblyName System.Windows.Forms
+            Add-Type -AssemblyName System.Drawing
             
-            $toastXml = @"
-<toast launch="app-defined-string">
-    <visual>
-        <binding template="ToastGeneric">
-            <text>Translation</text>
-            <text>Translated & copied!</text>
-        </binding>
-    </visual>
-</toast>
-"@
+            $notify = New-Object System.Windows.Forms.NotifyIcon
+            $notify.Icon = [System.Drawing.SystemIcons]::Information
+            $notify.Visible = $true
+            $notify.BalloonTipTitle = "PromptBridge"
+            $notify.BalloonTipText = "Translated and copied!"
+            $notify.ShowBalloonTip(3000)
             
-            $xmlDoc = New-Object Windows.Data.Xml.Dom.XmlDocument
-            $xmlDoc.LoadXml($toastXml)
-            $toast = [Windows.UI.Notifications.ToastNotification]::new($xmlDoc)
-            $notifier = [Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier("PromptBridge")
-            $notifier.Show($toast)
+            Start-Sleep -Seconds 3
             
-            Start-Sleep -Seconds 1.5
+            $notify.Dispose()
         } else {
             # Manual mode: show dialog with Copy/Close buttons
             Add-Type -AssemblyName PresentationFramework

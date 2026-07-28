@@ -57,16 +57,12 @@ log "Input: $TEXTO"
 
 # If nothing is selected, exit gracefully
 if [ -z "$TEXTO" ]; then
-    log "No text selected — exiting"
+    log "No text selected - exiting"
     exit 0
 fi
 
 # Backup current clipboard content
 OLD_CLIP="$TEXTO"
-
-# Show progress dialog using AppleScript
-osascript -e 'tell application "System Events" to display dialog "Translating..." with title "PromptBridge" buttons {"OK"} default button "OK" giving up after 3600' > /dev/null 2>&1 &
-PROG_PID=$!
 
 # Run translation (synchronously, capture output)
 RAW_RESULT=$(promptbridge translate "$TEXTO" 2>&1)
@@ -86,10 +82,6 @@ else
 fi
 log "Exit code: $EXIT_CODE | Result: $RESULT"
 
-# Close progress dialog
-kill $PROG_PID 2>/dev/null
-wait $PROG_PID 2>/dev/null
-
 # Check if auto_copy is enabled in config
 CONFIG_FILE="$HOME/Library/Application Support/promptbridge/promptbridge.toml"
 AUTO_COPY=$(grep -E "^auto_copy_clipboard\s*=" "$CONFIG_FILE" 2>/dev/null | cut -d= -f2 | tr -d ' "')
@@ -102,8 +94,8 @@ if [ $EXIT_CODE -eq 0 ] && [ -n "$RESULT" ]; then
         log "Auto-copied to clipboard"
         
         # Show notification
-        osascript -e 'display notification "✓ Translated & copied!" with title "PromptBridge" subtitle "Translation"' &
-        sleep 1.5
+        osascript -e 'display notification "Translated and copied!" with title "PromptBridge"'
+        sleep 2
     else
         # Manual mode: show dialog with Copy/Done buttons
         BUTTON=$(osascript -e 'tell application "System Events"
