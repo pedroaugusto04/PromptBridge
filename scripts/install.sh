@@ -68,6 +68,24 @@ if ! curl -fSL "$LATEST_URL" -o "$TMP_DIR/promptbridge.tar.gz"; then
     exit 1
 fi
 
+# Install dependencies on Linux
+if [ "$OS" = "Linux" ]; then
+    echo "Checking for required dependencies..."
+    if command -v apt-get >/dev/null 2>&1; then
+        echo "Installing dependencies via apt..."
+        sudo apt-get update -qq
+        sudo apt-get install -y xclip zenity libnotify-bin
+    elif command -v dnf >/dev/null 2>&1; then
+        echo "Installing dependencies via dnf..."
+        sudo dnf install -y xclip zenity libnotify
+    elif command -v pacman >/dev/null 2>&1; then
+        echo "Installing dependencies via pacman..."
+        sudo pacman -S --noconfirm xclip zenity libnotify
+    else
+        echo "Warning: Could not detect package manager. Please install xclip, zenity, and libnotify manually."
+    fi
+fi
+
 # Extract binary
 echo "Extracting binary..."
 tar -xzf "$TMP_DIR/promptbridge.tar.gz" -C "$TMP_DIR"
