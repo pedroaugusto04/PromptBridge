@@ -39,12 +39,13 @@ The installation script automatically configures everything for you. Just config
 - Shortcut: Set your preferred key combination (e.g., `Ctrl+Alt+T`)
 
 **Windows:**
-- Install [AutoHotkey](https://www.autohotkey.com/)
+- Install [AutoHotkey v2](https://www.autohotkey.com/)
 - Create a script with:
 ```autohotkey
-^t::  ; Ctrl+T
-Run, PowerShell.exe -ExecutionPolicy Bypass -File "%APPDATA%\promptbridge\pb-translate.ps1"
-return
+^!t::  ; Ctrl+Alt+T
+{
+    Run 'PowerShell.exe -ExecutionPolicy Bypass -File "%APPDATA%\promptbridge\pb-translate.ps1"'
+}
 ```
 
 **macOS:**

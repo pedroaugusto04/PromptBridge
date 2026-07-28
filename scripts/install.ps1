@@ -122,11 +122,12 @@ try {
     Write-Host "   ✓ promptbridge install-shortcut (keyboard shortcut helper)"
     Write-Host ""
     Write-Host "To configure your global hotkey:" -ForegroundColor Cyan
-    Write-Host "   1. Install AutoHotkey: https://www.autohotkey.com/"
+    Write-Host "   1. Install AutoHotkey v2: https://www.autohotkey.com/"
     Write-Host "   2. Create an .ahk script with:"
-    Write-Host "      ^t::  ; Ctrl+T"
-    Write-Host "      Run, PowerShell.exe -ExecutionPolicy Bypass -File `"%APPDATA%\promptbridge\pb-translate.ps1`""
-    Write-Host "      return"
+    Write-Host "      ^!t::  ; Ctrl+Alt+T"
+    Write-Host "      {"
+    Write-Host "          Run 'PowerShell.exe -ExecutionPolicy Bypass -File `"%APPDATA%\promptbridge\pb-translate.ps1`""'"
+    Write-Host "      }"
     Write-Host "   3. Run the AutoHotkey script"
     Write-Host ""
 

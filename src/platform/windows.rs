@@ -223,10 +223,13 @@ Log-Message "=== pb-translate done ==="
             
             let config_instructions = format!(
                 "Please configure the keyboard shortcut:\n\
-                 1. Open PowerShell as Administrator\n\
-                 2. Run: wmic path win32_shortcutshortcut call create '{}' (replace with actual path)\n\
-                 3. Or use AutoHotkey with: pb-translate.ps1\n\
-                 4. Example Shortcut Keys: Ctrl+Alt+T",
+                 1. Install AutoHotkey v2: https://www.autohotkey.com/\n\
+                 2. Create an .ahk script with:\n\
+                 3.   ^!t::  ; Ctrl+Alt+T\n\
+                 4.   {{\n\
+                 5.       Run 'PowerShell.exe -ExecutionPolicy Bypass -File \"{}\"'\n\
+                 6.   }}\n\
+                 7. Run the AutoHotkey script",
                 script_path.display()
             );
             
