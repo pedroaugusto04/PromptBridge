@@ -217,7 +217,9 @@ try {
 Log-Message "=== pb-translate done ==="
 "#;
 
-            std::fs::write(&script_path, script_content)?;
+            // Write with CRLF line endings for Windows PowerShell compatibility
+            let script_content_crlf = script_content.replace('\n', "\r\n");
+            std::fs::write(&script_path, script_content_crlf)?;
             
             let config_instructions = format!(
                 "Please configure the keyboard shortcut:\n\
