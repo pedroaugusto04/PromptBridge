@@ -52,8 +52,8 @@ echo "Checking for latest release..."
 LATEST_VERSION=$(curl -s https://api.github.com/repos/pedroaugusto04/PromptBridge/releases/latest | grep '"tag_name"' | cut -d'"' -f4)
 if [ -z "$LATEST_VERSION" ]; then
     echo "Warning: Could not fetch latest version from GitHub API (rate limited)"
-    echo "Using fallback version: v0.3.7"
-    LATEST_VERSION="v0.3.7"
+    echo "Using fallback version: v0.3.8"
+    LATEST_VERSION="v0.3.8"
 fi
 echo "Latest version: $LATEST_VERSION"
 
