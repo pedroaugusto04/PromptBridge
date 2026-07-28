@@ -102,7 +102,7 @@ if [ $EXIT_CODE -eq 0 ] && [ -n "$RESULT" ]; then
         log "Auto-copied to clipboard"
         
         # Show notification
-        osascript -e 'display notification "Translated and copied!" with title "PromptBridge"'
+        osascript -e 'display notification "✓ Translated & copied!" with title "PromptBridge"'
         sleep 2
     else
         # Manual mode: show dialog with Copy/Done buttons

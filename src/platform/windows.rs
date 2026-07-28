@@ -139,7 +139,7 @@ try {
             $notify.Icon = [System.Drawing.SystemIcons]::Information
             $notify.Visible = $true
             $notify.BalloonTipTitle = "PromptBridge"
-            $notify.BalloonTipText = "Translated and copied!"
+            $notify.BalloonTipText = "Translated & copied!"
             $notify.ShowBalloonTip(3000)
             
             Start-Sleep -Seconds 3
