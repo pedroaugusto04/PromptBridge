@@ -1,6 +1,6 @@
 [package]
 name = "promptbridge"
-version = "0.3.3"
+version = "0.3.4"
 edition = "2021"
 authors = ["PromptBridge Contributors"]
 description = "A quick CLI tool that translates coding prompts via global hotkey. Translated text is automatically copied to clipboard."
