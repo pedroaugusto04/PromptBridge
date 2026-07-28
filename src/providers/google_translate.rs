@@ -46,28 +46,12 @@ impl LlmProvider for GoogleTranslateProvider {
                 message: "No user message found in request".to_string(),
             })?;
 
-        // Extract target language from system message or default to English
+        // Use target_language from request or default to English
         let target_lang = request
-            .messages
-            .iter()
-            .filter(|m| m.role == crate::providers::types::Role::System)
-            .find_map(|m| {
-                // Try to extract language from system prompt like "Translate to: en"
-                if m.content.contains("Translate to:") {
-                    m.content
-                        .split("Translate to:")
-                        .nth(1)
-                        .map(|s| s.trim().to_string())
-                } else if m.content.contains("target language:") {
-                    m.content
-                        .split("target language:")
-                        .nth(1)
-                        .map(|s| s.trim().to_string())
-                } else {
-                    None
-                }
-            })
-            .unwrap_or_else(|| "en".to_string());
+            .target_language
+            .as_ref()
+            .map(|s| s.as_str())
+            .unwrap_or("en");
 
         // Use auto-detection for source language
         let source_lang = "auto";

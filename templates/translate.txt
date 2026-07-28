@@ -1,6 +1,6 @@
 {base_instructions}
 
-Translate the text to {target_language}.
+Translate to: {target_language}
 
 Rules:
 - Preserve meaning and sentence structure.

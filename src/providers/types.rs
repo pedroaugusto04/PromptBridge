@@ -43,6 +43,7 @@ pub struct CompletionRequest {
     pub temperature: Option<f32>,
     pub max_tokens: Option<u32>,
     pub model: Option<String>,
+    pub target_language: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

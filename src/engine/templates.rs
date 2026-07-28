@@ -65,7 +65,12 @@ impl TemplateEngine {
             }
             "translate.txt" => {
                 "{base_instructions}\n\n\
-                 TASK: Translate the natural language text into clean, professional '{target_language}'. Keep all code, placeholders, and technical identifiers identical."
+                 Translate to: {target_language}\n\n\
+                 Rules:\n\
+                 - Preserve meaning and sentence structure.\n\
+                 - Do not paraphrase.\n\
+                 - Keep code, placeholders, paths, commands, and identifiers unchanged.\n\
+                 - Return only the translation."
                     .to_string()
             }
             "optimize.txt" => {
