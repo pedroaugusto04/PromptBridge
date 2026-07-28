@@ -190,7 +190,7 @@ try {
     # Cleanup
 }
 
-Log-Message "=== pb-translate done ==="#;
+Log-Message "=== pb-translate done ===""#;
 
             // Write with CRLF line endings for Windows PowerShell compatibility
             let script_content_crlf = script_content.replace('\n', "\r\n");
