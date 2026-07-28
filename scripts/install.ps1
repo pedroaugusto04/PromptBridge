@@ -109,33 +109,23 @@ try {
     Write-Host "Installing keyboard shortcut..." -ForegroundColor Cyan
     & $promptbridgePath install-shortcut
 
-   Write-Host ""
-   Write-Host "=== Installation Complete ===" -ForegroundColor Green
-   Write-Host ""
-
-   Write-Host "PromptBridge has been installed successfully." -ForegroundColor Green
-   Write-Host ""
-
-   Write-Host "Installed components:" -ForegroundColor Cyan
-   Write-Host "   ✓ PromptBridge binary"
-   Write-Host "   ✓ Configuration"
-   Write-Host "   ✓ Keyboard shortcut helper"
-   Write-Host ""
-
-   Write-Host "IMPORTANT: If your PATH was updated, restart your terminal." -ForegroundColor Yellow
-   Write-Host ""
-
-   Write-Host "Verify the installation:" -ForegroundColor Cyan
-   Write-Host "   promptbridge --version"
-   Write-Host ""
-
-   Write-Host "If AutoHotkey v2 is not installed yet, download it from:" -ForegroundColor Cyan
-   Write-Host "   https://www.autohotkey.com/"
-   Write-Host ""
-
-   Write-Host "If needed, you can recreate the keyboard shortcut at any time by running:" -ForegroundColor Cyan
-   Write-Host "   promptbridge install-shortcut"
-   Write-Host ""
+    Write-Host ""
+    Write-Host "=== Installation Complete ===" -ForegroundColor Green
+    Write-Host ""
+    Write-Host "IMPORTANT: You MUST restart your terminal for PATH changes to take effect." -ForegroundColor Yellow
+    Write-Host ""
+    Write-Host "After restarting, verify installation:" -ForegroundColor Cyan
+    Write-Host "   promptbridge --version"
+    Write-Host ""
+    Write-Host "Your configuration is already set up! The script ran:" -ForegroundColor Green
+    Write-Host "   ✓ promptbridge init-config (interactive configuration)"
+    Write-Host "   ✓ promptbridge install-shortcut (keyboard shortcut helper)"
+    Write-Host ""
+    Write-Host "To configure your global hotkey:" -ForegroundColor Cyan
+    Write-Host "   1. Install AutoHotkey v2: https://www.autohotkey.com/"
+    Write-Host "   2. Double-click: $env:APPDATA\promptbridge\promptbridge.ahk"
+    Write-Host "   3. Press Ctrl+Alt+T to translate selected text"
+    Write-Host ""
 
 } finally {
     # Clean up temporary directory

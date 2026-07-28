@@ -67,34 +67,12 @@ Log-Message "Input: $clipText"
 
 # If nothing is selected, exit gracefully
 if ([string]::IsNullOrWhiteSpace($clipText)) {
-    Log-Message "No text selected — exiting"
+    Log-Message "No text selected - exiting"
     exit 0
 }
 
 # Backup current clipboard content
 $oldClip = $clipText
-
-# Show progress dialog using PowerShell WPF
-$progressScript = @'
-Add-Type -AssemblyName PresentationFramework
-[xml]$xaml = @"
-<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        Title="PromptBridge" Width="300" Height="100" WindowStyle="ToolWindow" Topmost="True">
-    <StackPanel Margin="20">
-        <TextBlock Text="Translating..." FontSize="14" HorizontalAlignment="Center"/>
-        <ProgressBar IsIndeterminate="True" Height="20" Margin="0,10"/>
-    </StackPanel>
-</Window>
-"@
-
-$reader = (New-Object System.Xml.XmlNodeReader $xaml)
-$window = [Windows.Markup.XamlReader]::Load($reader)
-$window.Show() | Out-Null
-$window.Close()
-'@
-
-# Start progress dialog in background
-$progressJob = Start-Job -ScriptBlock $progressScript
 
 try {
     # Run translation
@@ -142,7 +120,7 @@ try {
     <visual>
         <binding template="ToastGeneric">
             <text>Translation</text>
-            <text>✓ Translated & copied!</text>
+            <text>Translated & copied!</text>
         </binding>
     </visual>
 </toast>
@@ -209,28 +187,35 @@ try {
         [System.Windows.Forms.Clipboard]::SetText($oldClip)
     }
 } finally {
-    # Close progress dialog
-    Stop-Job $progressJob
-    Remove-Job $progressJob
+    # Cleanup
 }
 
-Log-Message "=== pb-translate done ==="
-"#;
+Log-Message "=== pb-translate done ==="#;
 
             // Write with CRLF line endings for Windows PowerShell compatibility
             let script_content_crlf = script_content.replace('\n', "\r\n");
             std::fs::write(&script_path, script_content_crlf)?;
             
+            // Create AutoHotkey script automatically
+            let ahk_script_path = bin_dir.join("promptbridge.ahk");
+            let ahk_content = r#"#Requires AutoHotkey v2.0
+; PromptBridge AutoHotkey Script - Ctrl+Alt+T to translate
+
+^!t::
+{
+    Run 'PowerShell.exe -ExecutionPolicy Bypass -File "%APPDATA%\promptbridge\pb-translate.ps1"'
+}
+"#;
+            std::fs::write(&ahk_script_path, ahk_content)?;
+
             let config_instructions = format!(
-                "Please configure the keyboard shortcut:\n\
+                "Keyboard shortcut configured!\n\
+                 \n\
+                 Next steps:\n\
                  1. Install AutoHotkey v2: https://www.autohotkey.com/\n\
-                 2. Create an .ahk script with:\n\
-                 3.   ^!t::  ; Ctrl+Alt+T\n\
-                 4.   {{\n\
-                 5.       Run 'PowerShell.exe -ExecutionPolicy Bypass -File \"{}\"'\n\
-                 6.   }}\n\
-                 7. Run the AutoHotkey script",
-                script_path.display()
+                 2. Double-click: {}\n\
+                 3. Press Ctrl+Alt+T to translate selected text",
+                ahk_script_path.display()
             );
             
             Ok(ShortcutInstallResult {
