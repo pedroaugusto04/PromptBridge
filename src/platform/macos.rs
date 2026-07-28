@@ -64,6 +64,10 @@ fi
 # Backup current clipboard content
 OLD_CLIP="$TEXTO"
 
+# Show progress dialog using AppleScript
+osascript -e 'tell application "System Events" to display dialog "Translating..." with title "PromptBridge" buttons {"OK"} default button "OK" giving up after 3600' > /dev/null 2>&1 &
+PROG_PID=$!
+
 # Run translation (synchronously, capture output)
 RAW_RESULT=$(promptbridge translate "$TEXTO" 2>&1)
 EXIT_CODE=$?
@@ -81,6 +85,10 @@ else
     RESULT=""
 fi
 log "Exit code: $EXIT_CODE | Result: $RESULT"
+
+# Close progress dialog
+kill $PROG_PID 2>/dev/null
+wait $PROG_PID 2>/dev/null
 
 # Check if auto_copy is enabled in config
 CONFIG_FILE="$HOME/Library/Application Support/promptbridge/promptbridge.toml"

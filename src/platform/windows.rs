@@ -74,6 +74,26 @@ if ([string]::IsNullOrWhiteSpace($clipText)) {
 # Backup current clipboard content
 $oldClip = $clipText
 
+# Show progress dialog
+Add-Type -AssemblyName System.Windows.Forms
+$form = New-Object System.Windows.Forms.Form
+$form.Text = "PromptBridge"
+$form.Size = New-Object System.Drawing.Size(300,100)
+$form.StartPosition = "CenterScreen"
+$form.FormBorderStyle = "FixedDialog"
+$form.MaximizeBox = $false
+$form.MinimizeBox = $false
+
+$label = New-Object System.Windows.Forms.Label
+$label.Text = "Translating..."
+$label.AutoSize = $true
+$label.Location = New-Object System.Drawing.Point(100,30)
+$form.Controls.Add($label)
+
+# Show form non-blocking
+$form.Show() | Out-Null
+$form.Refresh()
+
 try {
     # Run translation
     $rawResult = & promptbridge translate $clipText 2>&1
@@ -179,7 +199,8 @@ try {
         [System.Windows.Forms.Clipboard]::SetText($oldClip)
     }
 } finally {
-    # Cleanup
+    # Close progress dialog
+    $form.Close()
 }
 
 Log-Message "=== pb-translate done ===""#;
