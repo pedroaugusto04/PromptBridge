@@ -28,26 +28,9 @@ irm https://raw.githubusercontent.com/pedroaugusto04/PromptBridge/main/scripts/i
 
 ### Setup
 
-**1. Configure your AI provider:**
-```bash
-promptbridge init-config
-```
+The installation script automatically configures everything for you. Just configure your system hotkey:
 
-This interactive wizard will guide you through:
-- Selecting your translation provider (Google Translate, Ollama, OpenAI, or Mock)
-- Configuring provider-specific settings (URL, model, API keys)
-- Setting your target language
-- Configuring keep-alive interval
-
-> [!TIP]
-> Google Translate is the default provider and requires no configuration - it's free and works out of the box.
-
-**2. Install the keyboard shortcut helper:**
-```bash
-promptbridge install-shortcut
-```
-
-**3. Configure the system hotkey:**
+**1. Configure the system hotkey:**
 
 **Linux:**
 - Open **Settings** → **Keyboard** → **Keyboard Shortcuts** → **Custom Shortcuts (+)**
