@@ -377,34 +377,35 @@ impl PlatformNotifier for WindowsPlatform {
     fn show_notification(&self, title: &str, message: &str) -> Result<()> {
         let ps_script = format!(
             r#"
-Add-Type -AssemblyName Windows.Data.Xml.Dom
-Add-Type -AssemblyName Windows.UI.Notifications
+Add-Type -AssemblyName System.Windows.Forms
+Add-Type -AssemblyName System.Drawing
 
-$toastXml = @"
-<toast launch="app-defined-string">
-    <visual>
-        <binding template="ToastGeneric">
-            <text>{}</text>
-            <text>{}</text>
-        </binding>
-    </visual>
-</toast>
-"@
+$notify = New-Object System.Windows.Forms.NotifyIcon
 
-$xmlDoc = New-Object Windows.Data.Xml.Dom.XmlDocument
-$xmlDoc.LoadXml($toastXml)
-$toast = [Windows.UI.Notifications.ToastNotification]::new($xmlDoc)
-$notifier = [Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier("PromptBridge")
-$notifier.Show($toast)
+$notify.Icon = [System.Drawing.SystemIcons]::Information
+$notify.Visible = $true
+
+$notify.BalloonTipTitle = "{}"
+$notify.BalloonTipText = "{}"
+
+$notify.ShowBalloonTip(3000)
+
+Start-Sleep -Seconds 3
+
+$notify.Dispose()
 "#,
             title, message
         );
-        
+
         Command::new("powershell")
             .args(&["-Command", &ps_script])
             .status()
-            .map_err(|e| PromptBridgeError::Engine(format!("Failed to show notification: {}", e)))?;
-        
+            .map_err(|e| {
+                PromptBridgeError::Engine(
+                    format!("Failed to show notification: {}", e)
+                )
+            })?;
+
         Ok(())
     }
 }
