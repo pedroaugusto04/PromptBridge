@@ -13,7 +13,7 @@ target_language = "en"
 mode = "preview"
 
 # Automatically copy transformed prompt to clipboard when running standard transform command
-auto_copy_clipboard = false
+auto_copy_clipboard = true
 
 # Enable strict preservation of technical terms (code blocks, paths, logs, commands)
 preserve_technical_terms = true
@@ -30,21 +30,21 @@ type = "google_translate"
 type = "ollama"
 base_url = "https://pedro-duarte.ddns.net/ollama"
 model = "qwen-fast"
-temperature = 0.2
+temperature = 0.0
 
 [providers.openai]
 type = "openai"
 base_url = "https://api.openai.com/v1"
 api_key = "env:OPENAI_API_KEY" # Reads from environment variable or raw key string
 model = "gpt-4o-mini"
-temperature = 0.2
+temperature = 0.0
 
 [providers.deepseek]
 type = "openai"
 base_url = "https://api.deepseek.com/v1"
 api_key = "env:DEEPSEEK_API_KEY"
 model = "deepseek-coder"
-temperature = 0.2
+temperature = 0.0
 
 [providers.mock]
 type = "mock"
