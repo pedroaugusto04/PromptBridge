@@ -216,9 +216,12 @@ Log-Message "=== pb-translate done ===""#;
 
 ^!t::
 {
-    Run 'PowerShell.exe -ExecutionPolicy Bypass -File "%APPDATA%\promptbridge\pb-translate.ps1"'
+    Send "^c"
+    Sleep 300
+    RunWait 'PowerShell.exe -WindowStyle Hidden -ExecutionPolicy Bypass -File "' A_AppData '\promptbridge\pb-translate.ps1"', , "Hide"
 }
 "#;
+
             std::fs::write(&ahk_script_path, ahk_content)?;
 
             let config_instructions = format!(
