@@ -45,7 +45,7 @@ impl PlatformShortcutInstaller for WindowsPlatform {
             let script_content = r#"# PowerShell script for PromptBridge translation shortcut
 # Requires: PromptBridge installed via cargo
 
-$ErrorActionPreference = "Stop"
+$ErrorActionPreference = "Continue"
 
 # Log file for debugging
 $LogDir = "$env:LOCALAPPDATA\promptbridge"
@@ -96,7 +96,7 @@ $form.Refresh()
 
 try {
     # Run translation
-    $rawResult = & promptbridge translate $clipText 2>&1
+    $rawResult = & promptbridge translate $clipText
     $exitCode = $LASTEXITCODE
     
     # Log stderr if command failed
