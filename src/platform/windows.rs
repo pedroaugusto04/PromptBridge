@@ -1,5 +1,5 @@
 //! Windows-specific platform implementation
-//! 
+//!
 //! Uses:
 //! - PowerShell for clipboard access
 //! - PowerShell for dialogs (WPF/Windows Forms)
@@ -41,7 +41,7 @@ impl PlatformShortcutInstaller for WindowsPlatform {
             let bin_dir = appdata_dir.join("promptbridge");
             std::fs::create_dir_all(&bin_dir)?;
             let script_path = bin_dir.join("pb-translate.ps1");
-            
+
             let script_content = r#"# PowerShell script for PromptBridge translation shortcut
 # Requires: PromptBridge installed via cargo
 
@@ -96,7 +96,7 @@ $form.Refresh()
 
 try {
     # Run translation
-    $rawResult = & promptbridge translate $clipText
+    $rawResult = & promptbridge translate $clipText 2>&1 | Out-String
     $exitCode = $LASTEXITCODE
     
     # Log stderr if command failed
@@ -106,10 +106,10 @@ try {
     }
     
     # Extract translated text (after "--- Transformed Prompt ---")
-    if ($rawResult) {
-        $result = ($rawResult -split "--- Transformed Prompt ---")[1].Trim()
+    if ($rawResult -match "--- Transformed Prompt ---") {
+    $result = ($rawResult -split "--- Transformed Prompt ---", 2)[1].Trim()
     } else {
-        $result = ""
+        $result = $rawResult.Trim()
     }
     
     Log-Message "Exit code: $exitCode | Result: $result"
@@ -208,7 +208,7 @@ Log-Message "=== pb-translate done ===""#;
             // Write with CRLF line endings for Windows PowerShell compatibility
             let script_content_crlf = script_content.replace('\n', "\r\n");
             std::fs::write(&script_path, script_content_crlf)?;
-            
+
             // Create AutoHotkey script automatically
             let ahk_script_path = bin_dir.join("promptbridge.ahk");
             let ahk_content = r#"#Requires AutoHotkey v2.0
@@ -230,13 +230,15 @@ Log-Message "=== pb-translate done ===""#;
                  3. Press Ctrl+Alt+T to translate selected text",
                 ahk_script_path.display()
             );
-            
+
             Ok(ShortcutInstallResult {
                 script_path: script_path.display().to_string(),
                 config_instructions,
             })
         } else {
-            Err(PromptBridgeError::Engine("Could not locate APPDATA directory".to_string()))
+            Err(PromptBridgeError::Engine(
+                "Could not locate APPDATA directory".to_string(),
+            ))
         }
     }
 }
@@ -263,19 +265,21 @@ Start-Sleep -Seconds 3600
 "#,
             title, text
         );
-        
+
         let child = Command::new("powershell")
             .args(&["-Command", &ps_script])
             .stdout(Stdio::null())
             .stderr(Stdio::null())
             .spawn()
-            .map_err(|e| PromptBridgeError::Engine(format!("Failed to show progress dialog: {}", e)))?;
-        
+            .map_err(|e| {
+                PromptBridgeError::Engine(format!("Failed to show progress dialog: {}", e))
+            })?;
+
         Ok(Box::new(WindowsProgressDialogHandle {
             _child: Arc::new(Mutex::new(child)),
         }))
     }
-    
+
     fn show_text_info(&self, title: &str, text: &str) -> Result<TextInfoResult> {
         let ps_script = format!(
             r#"
@@ -325,19 +329,21 @@ $window.ShowDialog() | Out-Null
 "#,
             title, text
         );
-        
+
         let output = Command::new("powershell")
             .args(&["-Command", &ps_script])
             .output()
-            .map_err(|e| PromptBridgeError::Engine(format!("Failed to show text info dialog: {}", e)))?;
-        
+            .map_err(|e| {
+                PromptBridgeError::Engine(format!("Failed to show text info dialog: {}", e))
+            })?;
+
         if output.status.success() {
             Ok(TextInfoResult::Copy)
         } else {
             Ok(TextInfoResult::Done)
         }
     }
-    
+
     fn show_error(&self, title: &str, text: &str) -> Result<()> {
         let ps_script = format!(
             r#"
@@ -351,12 +357,14 @@ Add-Type -AssemblyName PresentationFramework
 "#,
             text, title
         );
-        
+
         Command::new("powershell")
             .args(&["-Command", &ps_script])
             .status()
-            .map_err(|e| PromptBridgeError::Engine(format!("Failed to show error dialog: {}", e)))?;
-        
+            .map_err(|e| {
+                PromptBridgeError::Engine(format!("Failed to show error dialog: {}", e))
+            })?;
+
         Ok(())
     }
 }
@@ -401,9 +409,7 @@ $notify.Dispose()
             .args(&["-Command", &ps_script])
             .status()
             .map_err(|e| {
-                PromptBridgeError::Engine(
-                    format!("Failed to show notification: {}", e)
-                )
+                PromptBridgeError::Engine(format!("Failed to show notification: {}", e))
             })?;
 
         Ok(())
@@ -416,17 +422,17 @@ impl PlatformClipboard for WindowsPlatform {
 Add-Type -AssemblyName System.Windows.Forms
 [System.Windows.Forms.Clipboard]::GetText()
 "#;
-        
+
         let output = Command::new("powershell")
             .args(&["-Command", ps_script])
             .output()
             .map_err(|e| PromptBridgeError::Clipboard(format!("Failed to get clipboard: {}", e)))?;
-        
+
         String::from_utf8(output.stdout)
             .map(|s| s.trim().to_string())
             .map_err(|e| PromptBridgeError::Clipboard(format!("Failed to parse clipboard: {}", e)))
     }
-    
+
     fn set_text(&self, text: &str) -> Result<()> {
         let ps_script = format!(
             r#"
@@ -435,12 +441,12 @@ Add-Type -AssemblyName System.Windows.Forms
 "#,
             text.replace('"', "`\"")
         );
-        
+
         Command::new("powershell")
             .args(&["-Command", &ps_script])
             .status()
             .map_err(|e| PromptBridgeError::Clipboard(format!("Failed to set clipboard: {}", e)))?;
-        
+
         Ok(())
     }
 }

@@ -31,7 +31,7 @@ impl TemplateEngine {
     fn load_template(filename: &str) -> String {
         // Try to load from the templates directory relative to the executable
         let template_path = format!("templates/{}", filename);
-        
+
         // If running from the project directory, try relative path
         if let Ok(content) = fs::read_to_string(&template_path) {
             return content;

@@ -21,7 +21,10 @@ pub trait LlmProvider: Send + Sync {
 pub struct ProviderFactory;
 
 impl ProviderFactory {
-    pub fn create(config: &ProviderConfig, keep_alive_minutes: Option<u64>) -> Result<Box<dyn LlmProvider>> {
+    pub fn create(
+        config: &ProviderConfig,
+        keep_alive_minutes: Option<u64>,
+    ) -> Result<Box<dyn LlmProvider>> {
         match config.provider_type.as_str() {
             "google_translate" | "google-translate" => Ok(Box::new(google_translate::GoogleTranslateProvider::new()?)),
             "ollama" => Ok(Box::new(ollama::OllamaProvider::new(

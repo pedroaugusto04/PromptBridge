@@ -1,5 +1,5 @@
 //! Platform abstraction layer for cross-platform support
-//! 
+//!
 //! This module provides trait-based abstractions for platform-specific operations:
 //! - Shortcut installation
 //! - Dialog display (progress, text info, error)
@@ -25,10 +25,10 @@ pub struct ShortcutInstallResult {
 pub trait PlatformDialog {
     /// Show a pulsating progress dialog (non-blocking)
     fn show_progress(&self, title: &str, text: &str) -> Result<Box<dyn ProgressDialogHandle>>;
-    
+
     /// Show a text info dialog with Copy/Done buttons
     fn show_text_info(&self, title: &str, text: &str) -> Result<TextInfoResult>;
-    
+
     /// Show an error dialog
     fn show_error(&self, title: &str, text: &str) -> Result<()>;
 }
@@ -56,7 +56,7 @@ pub trait PlatformNotifier {
 pub trait PlatformClipboard {
     /// Get text from clipboard
     fn get_text(&self) -> Result<String>;
-    
+
     /// Set text to clipboard
     fn set_text(&self, text: &str) -> Result<()>;
 }
@@ -83,17 +83,17 @@ pub fn get_platform() -> Box<dyn PlatformShortcutInstaller> {
     {
         Box::new(LinuxPlatform::new())
     }
-    
+
     #[cfg(target_os = "windows")]
     {
         Box::new(WindowsPlatform::new())
     }
-    
+
     #[cfg(target_os = "macos")]
     {
         Box::new(MacosPlatform::new())
     }
-    
+
     #[cfg(not(any(target_os = "linux", target_os = "windows", target_os = "macos")))]
     {
         compile_error!("Unsupported platform");

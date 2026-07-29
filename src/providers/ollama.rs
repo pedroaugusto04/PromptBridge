@@ -1,4 +1,6 @@
-use crate::constants::{get_ollama_base_url, get_ollama_model, get_request_timeout, get_temperature};
+use crate::constants::{
+    get_ollama_base_url, get_ollama_model, get_request_timeout, get_temperature,
+};
 use crate::providers::types::{CompletionRequest, CompletionResponse, Role};
 use crate::providers::LlmProvider;
 use crate::utils::error::{PromptBridgeError, Result};
@@ -30,13 +32,12 @@ impl OllamaProvider {
 
         let keep_alive = keep_alive_minutes.map(|mins| format!("{}m", mins));
 
-        let client = Client::builder()
-            .timeout(timeout)
-            .build()
-            .map_err(|e| PromptBridgeError::Provider {
+        let client = Client::builder().timeout(timeout).build().map_err(|e| {
+            PromptBridgeError::Provider {
                 provider: "Ollama".to_string(),
                 message: format!("Failed to create HTTP client: {}", e),
-            })?;
+            }
+        })?;
 
         Ok(Self {
             client,
@@ -111,10 +112,7 @@ impl LlmProvider for OllamaProvider {
             },
         };
 
-        let mut request_builder = self
-            .client
-            .post(&url)
-            .json(&payload);
+        let mut request_builder = self.client.post(&url).json(&payload);
 
         // Add Authorization header if an auth token is configured
         if let Some(token) = &self.auth_token {

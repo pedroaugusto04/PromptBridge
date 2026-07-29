@@ -3,9 +3,7 @@ use promptbridge::cli::{Cli, Commands, ConfigSubcommand};
 use promptbridge::config::{Config, ProviderConfig};
 use promptbridge::engine::{TransformMode, TransformationPipeline};
 use promptbridge::exec::ExecGateway;
-use promptbridge::messages::{
-    format_provider_list_item, MSG_INPUT_PROMPT_EMPTY,
-};
+use promptbridge::messages::{format_provider_list_item, MSG_INPUT_PROMPT_EMPTY};
 use promptbridge::platform::{get_platform, get_platform_dialog, get_platform_notifier};
 use promptbridge::providers::{LlmProvider, ProviderFactory};
 use promptbridge::utils::clipboard::copy_to_clipboard;
@@ -23,12 +21,12 @@ async fn main() {
     if let Err(err) = run_app(cli).await {
         let platform = get_platform_dialog();
         let error_msg = err.user_facing_message();
-        
+
         // Try to show error in modal, fall back to stderr
         if let Err(_) = platform.show_error("PromptBridge Error", &error_msg) {
             print_error(&error_msg);
         }
-        
+
         std::process::exit(1);
     }
 }
@@ -117,7 +115,13 @@ async fn run_app(cli: Cli) -> Result<()> {
             }
             Some(ConfigSubcommand::Path) => {
                 if let Some(user_config) = dirs::config_dir() {
-                    println!("{}", user_config.join("promptbridge").join("config.toml").display());
+                    println!(
+                        "{}",
+                        user_config
+                            .join("promptbridge")
+                            .join("config.toml")
+                            .display()
+                    );
                 }
             }
         },
@@ -126,12 +130,15 @@ async fn run_app(cli: Cli) -> Result<()> {
             println!("Configured LLM Providers:");
             for (name, prov) in &config.providers {
                 let is_default = name == &config.general.default_provider;
-                println!("{}", format_provider_list_item(
-                    name,
-                    is_default,
-                    &prov.provider_type,
-                    prov.model.as_deref().unwrap_or("default")
-                ));
+                println!(
+                    "{}",
+                    format_provider_list_item(
+                        name,
+                        is_default,
+                        &prov.provider_type,
+                        prov.model.as_deref().unwrap_or("default")
+                    )
+                );
             }
         }
 
@@ -150,11 +157,11 @@ async fn run_app(cli: Cli) -> Result<()> {
 fn install_shortcut() -> Result<()> {
     let platform = get_platform();
     let result = platform.install_shortcut()?;
-    
+
     println!("✓ Created helper script at: {}", result.script_path);
     println!("\n=== Installation complete ===");
     println!("{}", result.config_instructions);
-    
+
     Ok(())
 }
 
@@ -172,7 +179,9 @@ async fn process_single_prompt(
     };
 
     if raw_text.trim().is_empty() {
-        return Err(PromptBridgeError::Engine(MSG_INPUT_PROMPT_EMPTY.to_string()));
+        return Err(PromptBridgeError::Engine(
+            MSG_INPUT_PROMPT_EMPTY.to_string(),
+        ));
     }
 
     // Show loading notification
@@ -202,7 +211,10 @@ async fn process_single_prompt(
     .await?;
 
     if config.general.mode == "preview" {
-        eprintln!("{}", format_diff(&result.original_text, &result.final_prompt));
+        eprintln!(
+            "{}",
+            format_diff(&result.original_text, &result.final_prompt)
+        );
     } else {
         println!("{}", result.final_prompt);
     }
@@ -218,18 +230,20 @@ async fn process_single_prompt(
 }
 
 fn init_config_interactive() -> Result<()> {
-    use dialoguer::{Select, Input, Confirm};
-    
+    use dialoguer::{Confirm, Input, Select};
+
     println!("PromptBridge Interactive Configuration\n");
-    
+
     // Get config directory
     let config_dir = dirs::config_dir()
-        .ok_or_else(|| PromptBridgeError::Config("Could not determine config directory".to_string()))?
+        .ok_or_else(|| {
+            PromptBridgeError::Config("Could not determine config directory".to_string())
+        })?
         .join("promptbridge");
-    
+
     std::fs::create_dir_all(&config_dir)?;
     let config_path = config_dir.join("promptbridge.toml");
-    
+
     // Load existing config or create default
     let mut config = if config_path.exists() {
         let content = std::fs::read_to_string(&config_path)?;
@@ -237,7 +251,7 @@ fn init_config_interactive() -> Result<()> {
     } else {
         Config::load(None)?
     };
-    
+
     // Select provider
     let providers = vec!["google_translate", "ollama", "openai", "mock"];
     let selection = Select::new()
@@ -246,10 +260,10 @@ fn init_config_interactive() -> Result<()> {
         .default(0)
         .interact()
         .map_err(|e| PromptBridgeError::Config(format!("Interactive prompt failed: {}", e)))?;
-    
+
     let selected_provider = providers[selection];
     config.general.default_provider = selected_provider.to_string();
-    
+
     // Provider-specific configuration
     match selected_provider {
         "google_translate" => {
@@ -261,7 +275,9 @@ fn init_config_interactive() -> Result<()> {
                 temperature: None,
             };
 
-            config.providers.insert("google_translate".to_string(), provider_config);
+            config
+                .providers
+                .insert("google_translate".to_string(), provider_config);
         }
 
         "ollama" => {
@@ -269,7 +285,9 @@ fn init_config_interactive() -> Result<()> {
                 .with_prompt("Ollama base URL (default: http://localhost:11434)")
                 .allow_empty(true)
                 .interact()
-                .map_err(|e| PromptBridgeError::Config(format!("Interactive prompt failed: {}", e)))?;
+                .map_err(|e| {
+                    PromptBridgeError::Config(format!("Interactive prompt failed: {}", e))
+                })?;
             let base_url = if base_url.is_empty() {
                 "http://localhost:11434".to_string()
             } else {
@@ -280,28 +298,36 @@ fn init_config_interactive() -> Result<()> {
                 .with_prompt("Model name (default: llama3.2)")
                 .allow_empty(true)
                 .interact()
-                .map_err(|e| PromptBridgeError::Config(format!("Interactive prompt failed: {}", e)))?;
+                .map_err(|e| {
+                    PromptBridgeError::Config(format!("Interactive prompt failed: {}", e))
+                })?;
             let model = if model.is_empty() {
                 "llama3.2".to_string()
             } else {
                 model
             };
-            
+
             let use_auth = Confirm::new()
                 .with_prompt("Does your Ollama instance require authentication?")
                 .default(false)
                 .interact()
-                .map_err(|e| PromptBridgeError::Config(format!("Interactive prompt failed: {}", e)))?;
-            
+                .map_err(|e| {
+                    PromptBridgeError::Config(format!("Interactive prompt failed: {}", e))
+                })?;
+
             let api_key = if use_auth {
-                Some(Input::new()
-                    .with_prompt("API key / Bearer token")
-                    .interact()
-                    .map_err(|e| PromptBridgeError::Config(format!("Interactive prompt failed: {}", e)))?)
+                Some(
+                    Input::new()
+                        .with_prompt("API key / Bearer token")
+                        .interact()
+                        .map_err(|e| {
+                            PromptBridgeError::Config(format!("Interactive prompt failed: {}", e))
+                        })?,
+                )
             } else {
                 None
             };
-            
+
             let provider_config = ProviderConfig {
                 provider_type: "ollama".to_string(),
                 base_url: Some(base_url),
@@ -309,16 +335,20 @@ fn init_config_interactive() -> Result<()> {
                 model: Some(model),
                 temperature: Some(0.0),
             };
-            
-            config.providers.insert("ollama".to_string(), provider_config);
+
+            config
+                .providers
+                .insert("ollama".to_string(), provider_config);
         }
-        
+
         "openai" => {
             let base_url: String = Input::new()
                 .with_prompt("OpenAI API base URL (default: https://api.openai.com/v1)")
                 .allow_empty(true)
                 .interact()
-                .map_err(|e| PromptBridgeError::Config(format!("Interactive prompt failed: {}", e)))?;
+                .map_err(|e| {
+                    PromptBridgeError::Config(format!("Interactive prompt failed: {}", e))
+                })?;
             let base_url = if base_url.is_empty() {
                 "https://api.openai.com/v1".to_string()
             } else {
@@ -329,19 +359,23 @@ fn init_config_interactive() -> Result<()> {
                 .with_prompt("API key")
                 .allow_empty(true)
                 .interact()
-                .map_err(|e| PromptBridgeError::Config(format!("Interactive prompt failed: {}", e)))?;
+                .map_err(|e| {
+                    PromptBridgeError::Config(format!("Interactive prompt failed: {}", e))
+                })?;
 
             let model: String = Input::new()
                 .with_prompt("Model name (default: gpt-4o-mini)")
                 .allow_empty(true)
                 .interact()
-                .map_err(|e| PromptBridgeError::Config(format!("Interactive prompt failed: {}", e)))?;
+                .map_err(|e| {
+                    PromptBridgeError::Config(format!("Interactive prompt failed: {}", e))
+                })?;
             let model = if model.is_empty() {
                 "gpt-4o-mini".to_string()
             } else {
                 model
             };
-            
+
             let provider_config = ProviderConfig {
                 provider_type: "openai".to_string(),
                 base_url: Some(base_url),
@@ -349,10 +383,12 @@ fn init_config_interactive() -> Result<()> {
                 model: Some(model),
                 temperature: Some(0.0),
             };
-            
-            config.providers.insert("openai".to_string(), provider_config);
+
+            config
+                .providers
+                .insert("openai".to_string(), provider_config);
         }
-        
+
         "mock" => {
             let provider_config = ProviderConfig {
                 provider_type: "mock".to_string(),
@@ -361,13 +397,13 @@ fn init_config_interactive() -> Result<()> {
                 model: None,
                 temperature: Some(0.0),
             };
-            
+
             config.providers.insert("mock".to_string(), provider_config);
         }
-        
+
         _ => unreachable!(),
     }
-    
+
     // Target language
     let target_lang: String = Input::new()
         .with_prompt("Target language for translation (default: en)")
@@ -393,18 +429,18 @@ fn init_config_interactive() -> Result<()> {
     } else {
         keep_alive
     };
-    
+
     config.general.keep_alive_interval_minutes = Some(keep_alive.parse::<u64>().unwrap_or(60));
-    
+
     // Save configuration
-    let toml_str = toml::to_string_pretty(&config)
-        .map_err(|e| PromptBridgeError::Config(e.to_string()))?;
-    
+    let toml_str =
+        toml::to_string_pretty(&config).map_err(|e| PromptBridgeError::Config(e.to_string()))?;
+
     std::fs::write(&config_path, toml_str)?;
-    
+
     println!("\nConfiguration saved to: {}", config_path.display());
     println!("You can edit this file manually if needed.");
-    
+
     Ok(())
 }
 

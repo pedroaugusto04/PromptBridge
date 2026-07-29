@@ -8,10 +8,7 @@ pub enum PromptBridgeError {
     Config(String),
 
     #[error("LLM Provider Error [{provider}]: {message}")]
-    Provider {
-        provider: String,
-        message: String,
-    },
+    Provider { provider: String, message: String },
 
     #[error("Technical Parser Error: {0}")]
     Parser(String),
@@ -42,7 +39,10 @@ impl PromptBridgeError {
     pub fn user_facing_message(&self) -> String {
         match self {
             Self::Config(msg) => format!("Configuration Issue: {}\nTip: {}", msg, TIP_CONFIG_ERROR),
-            Self::Provider { provider, message } => format!("Provider '{}' Failed: {}\nTip: {}", provider, message, TIP_PROVIDER_ERROR),
+            Self::Provider { provider, message } => format!(
+                "Provider '{}' Failed: {}\nTip: {}",
+                provider, message, TIP_PROVIDER_ERROR
+            ),
             Self::Exec(msg) => format!("Proxy Gateway Error: {}\nTip: {}", msg, TIP_EXEC_ERROR),
             other => format!("{}", other),
         }

@@ -1,4 +1,6 @@
-use crate::constants::{get_openai_base_url, get_openai_model, get_request_timeout, get_temperature};
+use crate::constants::{
+    get_openai_base_url, get_openai_model, get_request_timeout, get_temperature,
+};
 use crate::providers::types::{CompletionRequest, CompletionResponse, Role};
 use crate::providers::LlmProvider;
 use crate::utils::error::{PromptBridgeError, Result};
@@ -36,13 +38,12 @@ impl OpenAiProvider {
         let temperature = temperature.unwrap_or_else(get_temperature);
         let timeout = get_request_timeout();
 
-        let client = Client::builder()
-            .timeout(timeout)
-            .build()
-            .map_err(|e| PromptBridgeError::Provider {
+        let client = Client::builder().timeout(timeout).build().map_err(|e| {
+            PromptBridgeError::Provider {
                 provider: "OpenAI".to_string(),
                 message: format!("Failed to create HTTP client: {}", e),
-            })?;
+            }
+        })?;
 
         Ok(Self {
             client,
@@ -152,20 +153,28 @@ impl LlmProvider for OpenAiProvider {
                 message: format!("Failed to parse OpenAI JSON response: {}", e),
             })?;
 
-        let choice = response_payload.choices.first().ok_or_else(|| {
-            PromptBridgeError::Provider {
-                provider: "OpenAI".to_string(),
-                message: "API returned zero choices".to_string(),
-            }
-        })?;
+        let choice =
+            response_payload
+                .choices
+                .first()
+                .ok_or_else(|| PromptBridgeError::Provider {
+                    provider: "OpenAI".to_string(),
+                    message: "API returned zero choices".to_string(),
+                })?;
 
         let content = choice.message.content.clone().unwrap_or_default();
 
         Ok(CompletionResponse {
             content,
             model: response_payload.model,
-            prompt_tokens: response_payload.usage.as_ref().and_then(|u| u.prompt_tokens),
-            completion_tokens: response_payload.usage.as_ref().and_then(|u| u.completion_tokens),
+            prompt_tokens: response_payload
+                .usage
+                .as_ref()
+                .and_then(|u| u.prompt_tokens),
+            completion_tokens: response_payload
+                .usage
+                .as_ref()
+                .and_then(|u| u.completion_tokens),
         })
     }
 

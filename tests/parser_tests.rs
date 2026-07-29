@@ -54,7 +54,10 @@ fn test_rejects_oversized_input() {
     let oversized_input = "a".repeat(101_000);
     let result = TechnicalParser::extract(&oversized_input);
     assert!(result.is_err());
-    assert!(result.unwrap_err().to_string().contains("exceeds maximum size"));
+    assert!(result
+        .unwrap_err()
+        .to_string()
+        .contains("exceeds maximum size"));
 }
 
 #[test]
@@ -66,7 +69,10 @@ fn test_rejects_oversized_response() {
     let oversized_response = "a".repeat(11_000);
     let result = TechnicalParser::restore(&oversized_response, &items);
     assert!(result.is_err());
-    assert!(result.unwrap_err().to_string().contains("exceeds maximum size"));
+    assert!(result
+        .unwrap_err()
+        .to_string()
+        .contains("exceeds maximum size"));
 }
 
 #[test]
@@ -75,5 +81,8 @@ fn test_rejects_excessive_extracted_items() {
     let many_code_blocks = "```rust\ncode\n```".repeat(1001);
     let result = TechnicalParser::extract(&many_code_blocks);
     assert!(result.is_err());
-    assert!(result.unwrap_err().to_string().contains("Too many technical elements"));
+    assert!(result
+        .unwrap_err()
+        .to_string()
+        .contains("Too many technical elements"));
 }

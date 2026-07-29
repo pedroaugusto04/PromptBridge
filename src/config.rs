@@ -1,6 +1,4 @@
-use crate::constants::{
-    APP_NAME, CONFIG_FILE_NAME, DEFAULT_CONFIG_TOML, DEFAULT_TARGET_LANGUAGE,
-};
+use crate::constants::{APP_NAME, CONFIG_FILE_NAME, DEFAULT_CONFIG_TOML, DEFAULT_TARGET_LANGUAGE};
 use crate::utils::error::{PromptBridgeError, Result};
 use figment::{
     providers::{Format, Toml},

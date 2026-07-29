@@ -13,14 +13,13 @@ pub struct GoogleTranslateProvider {
 impl GoogleTranslateProvider {
     pub fn new() -> Result<Self> {
         let timeout = std::time::Duration::from_secs(30);
-        
-        let client = Client::builder()
-            .timeout(timeout)
-            .build()
-            .map_err(|e| PromptBridgeError::Provider {
+
+        let client = Client::builder().timeout(timeout).build().map_err(|e| {
+            PromptBridgeError::Provider {
                 provider: "GoogleTranslate".to_string(),
                 message: format!("Failed to create HTTP client: {}", e),
-            })?;
+            }
+        })?;
 
         Ok(Self {
             client,
@@ -28,8 +27,6 @@ impl GoogleTranslateProvider {
         })
     }
 }
-
-
 
 #[async_trait]
 impl LlmProvider for GoogleTranslateProvider {
@@ -101,8 +98,8 @@ impl LlmProvider for GoogleTranslateProvider {
 
         // Parse the JSON response (Google Translate returns nested array structure)
         // Use Value to handle complex structure with nulls
-        let response: Value = serde_json::from_str(&response_text)
-            .map_err(|e| PromptBridgeError::Provider {
+        let response: Value =
+            serde_json::from_str(&response_text).map_err(|e| PromptBridgeError::Provider {
                 provider: "GoogleTranslate".to_string(),
                 message: format!("Failed to parse Google Translate response: {}", e),
             })?;

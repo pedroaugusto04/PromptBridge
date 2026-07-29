@@ -1,5 +1,5 @@
 //! MacOS-specific platform implementation
-//! 
+//!
 //! Uses:
 //! - osascript for clipboard access
 //! - AppleScript for dialogs
@@ -37,10 +37,13 @@ impl PlatformShortcutInstaller for MacosPlatform {
 
         // 2. Create the shortcut script in ~/Library/Application Support/promptbridge/pb-translate.sh
         if let Some(home_dir) = dirs::home_dir() {
-            let bin_dir = home_dir.join("Library").join("Application Support").join("promptbridge");
+            let bin_dir = home_dir
+                .join("Library")
+                .join("Application Support")
+                .join("promptbridge");
             std::fs::create_dir_all(&bin_dir)?;
             let script_path = bin_dir.join("pb-translate.sh");
-            
+
             let script_content = r#"#!/bin/bash
 
 # Log file for debugging
@@ -126,12 +129,12 @@ log "=== pb-translate done ==="
 "#;
 
             std::fs::write(&script_path, script_content)?;
-            
+
             use std::os::unix::fs::PermissionsExt;
             let mut perms = std::fs::metadata(&script_path)?.permissions();
             perms.set_mode(0o755);
             std::fs::set_permissions(&script_path, perms)?;
-            
+
             let config_instructions = format!(
                 "Please configure the keyboard shortcut:\n\
                  1. Open System Settings -> Keyboard -> Keyboard Shortcuts -> App Shortcuts\n\
@@ -148,13 +151,15 @@ log "=== pb-translate done ==="
                  5. Assign keyboard shortcut in System Settings",
                 script_path.display()
             );
-            
+
             Ok(ShortcutInstallResult {
                 script_path: script_path.display().to_string(),
                 config_instructions,
             })
         } else {
-            Err(PromptBridgeError::Engine("Could not locate home directory".to_string()))
+            Err(PromptBridgeError::Engine(
+                "Could not locate home directory".to_string(),
+            ))
         }
     }
 }
@@ -167,32 +172,37 @@ impl PlatformDialog for MacosPlatform {
             end tell"#,
             text, title
         );
-        
+
         let child = Command::new("osascript")
             .args(&["-e", &applescript])
             .stdout(Stdio::null())
             .stderr(Stdio::null())
             .spawn()
-            .map_err(|e| PromptBridgeError::Engine(format!("Failed to show progress dialog: {}", e)))?;
-        
+            .map_err(|e| {
+                PromptBridgeError::Engine(format!("Failed to show progress dialog: {}", e))
+            })?;
+
         Ok(Box::new(MacosProgressDialogHandle {
             _child: Arc::new(Mutex::new(child)),
         }))
     }
-    
+
     fn show_text_info(&self, title: &str, text: &str) -> Result<TextInfoResult> {
         let applescript = format!(
             r#"tell application "System Events"
                 set result to button returned of (display dialog "{}" with title "{}" buttons {{"Copy", "Done"}} default button "Copy" with icon note)
             end tell"#,
-            text.replace('"', r#"\\""#), title
+            text.replace('"', r#"\\""#),
+            title
         );
-        
+
         let output = Command::new("osascript")
             .args(&["-e", &applescript])
             .output()
-            .map_err(|e| PromptBridgeError::Engine(format!("Failed to show text info dialog: {}", e)))?;
-        
+            .map_err(|e| {
+                PromptBridgeError::Engine(format!("Failed to show text info dialog: {}", e))
+            })?;
+
         let result = String::from_utf8_lossy(&output.stdout);
         if result.contains("Copy") {
             Ok(TextInfoResult::Copy)
@@ -200,20 +210,23 @@ impl PlatformDialog for MacosPlatform {
             Ok(TextInfoResult::Done)
         }
     }
-    
+
     fn show_error(&self, title: &str, text: &str) -> Result<()> {
         let applescript = format!(
             r#"tell application "System Events"
                 display dialog "{}" with title "{}" buttons {{"OK"}} with icon stop
             end tell"#,
-            text.replace('"', r#"\\""#), title
+            text.replace('"', r#"\\""#),
+            title
         );
-        
+
         Command::new("osascript")
             .args(&["-e", &applescript])
             .status()
-            .map_err(|e| PromptBridgeError::Engine(format!("Failed to show error dialog: {}", e)))?;
-        
+            .map_err(|e| {
+                PromptBridgeError::Engine(format!("Failed to show error dialog: {}", e))
+            })?;
+
         Ok(())
     }
 }
@@ -234,14 +247,17 @@ impl PlatformNotifier for MacosPlatform {
     fn show_notification(&self, title: &str, message: &str) -> Result<()> {
         let applescript = format!(
             r#"display notification "{}" with title "{}""#,
-            message.replace('"', r#"\\""#), title
+            message.replace('"', r#"\\""#),
+            title
         );
-        
+
         Command::new("osascript")
             .args(&["-e", &applescript])
             .status()
-            .map_err(|e| PromptBridgeError::Engine(format!("Failed to show notification: {}", e)))?;
-        
+            .map_err(|e| {
+                PromptBridgeError::Engine(format!("Failed to show notification: {}", e))
+            })?;
+
         Ok(())
     }
 }
@@ -249,28 +265,25 @@ impl PlatformNotifier for MacosPlatform {
 impl PlatformClipboard for MacosPlatform {
     fn get_text(&self) -> Result<String> {
         let applescript = r#"tell application "System Events" to get the clipboard"#;
-        
+
         let output = Command::new("osascript")
             .args(&["-e", applescript])
             .output()
             .map_err(|e| PromptBridgeError::Clipboard(format!("Failed to get clipboard: {}", e)))?;
-        
+
         String::from_utf8(output.stdout)
             .map(|s| s.trim().to_string())
             .map_err(|e| PromptBridgeError::Clipboard(format!("Failed to parse clipboard: {}", e)))
     }
-    
+
     fn set_text(&self, text: &str) -> Result<()> {
-        let applescript = format!(
-            r#"set the clipboard to "{}""#,
-            text.replace('"', r#"\\""#)
-        );
-        
+        let applescript = format!(r#"set the clipboard to "{}""#, text.replace('"', r#"\\""#));
+
         Command::new("osascript")
             .args(&["-e", &applescript])
             .status()
             .map_err(|e| PromptBridgeError::Clipboard(format!("Failed to set clipboard: {}", e)))?;
-        
+
         Ok(())
     }
 }

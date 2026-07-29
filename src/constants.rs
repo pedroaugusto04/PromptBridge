@@ -22,8 +22,7 @@ pub fn get_ollama_base_url() -> String {
 }
 
 pub fn get_ollama_model() -> String {
-    std::env::var("PROMPTBRIDGE_OLLAMA_MODEL")
-        .unwrap_or_else(|_| "llama3.2".to_string())
+    std::env::var("PROMPTBRIDGE_OLLAMA_MODEL").unwrap_or_else(|_| "llama3.2".to_string())
 }
 
 pub fn get_openai_base_url() -> String {
@@ -32,13 +31,11 @@ pub fn get_openai_base_url() -> String {
 }
 
 pub fn get_openai_model() -> String {
-    std::env::var("PROMPTBRIDGE_OPENAI_MODEL")
-        .unwrap_or_else(|_| "gpt-4o-mini".to_string())
+    std::env::var("PROMPTBRIDGE_OPENAI_MODEL").unwrap_or_else(|_| "gpt-4o-mini".to_string())
 }
 
 pub fn get_target_language() -> String {
-    std::env::var("PROMPTBRIDGE_TARGET_LANGUAGE")
-        .unwrap_or_else(|_| "en".to_string())
+    std::env::var("PROMPTBRIDGE_TARGET_LANGUAGE").unwrap_or_else(|_| "en".to_string())
 }
 
 pub fn get_temperature() -> f32 {
@@ -49,8 +46,7 @@ pub fn get_temperature() -> f32 {
 }
 
 pub fn get_display_mode() -> String {
-    std::env::var("PROMPTBRIDGE_MODE")
-        .unwrap_or_else(|_| "preview".to_string())
+    std::env::var("PROMPTBRIDGE_MODE").unwrap_or_else(|_| "preview".to_string())
 }
 
 pub fn get_request_timeout() -> Duration {

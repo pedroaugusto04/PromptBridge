@@ -1,8 +1,7 @@
 use crate::config::Config;
 use crate::engine::{TransformMode, TransformationPipeline};
 use crate::messages::{
-    format_child_exit_warning, format_dry_run_info, format_exec_argv_info,
-    MSG_NO_COMMAND_SPECIFIED,
+    format_child_exit_warning, format_dry_run_info, format_exec_argv_info, MSG_NO_COMMAND_SPECIFIED,
 };
 use crate::providers::{LlmProvider, ProviderFactory};
 use crate::utils::error::{PromptBridgeError, Result};
@@ -22,7 +21,9 @@ impl ExecGateway {
         dry_run: bool,
     ) -> Result<()> {
         if cmd_args.is_empty() {
-            return Err(PromptBridgeError::Exec(MSG_NO_COMMAND_SPECIFIED.to_string()));
+            return Err(PromptBridgeError::Exec(
+                MSG_NO_COMMAND_SPECIFIED.to_string(),
+            ));
         }
 
         let binary = &cmd_args[0];
@@ -46,7 +47,8 @@ impl ExecGateway {
         // Inspect argv positional arguments to see if a raw prompt argument was passed
         let mut modified_args: Vec<String> = Vec::new();
         for arg in args {
-            if !arg.starts_with('-') && arg.contains(' ') && arg.chars().any(|c| c.is_alphabetic()) {
+            if !arg.starts_with('-') && arg.contains(' ') && arg.chars().any(|c| c.is_alphabetic())
+            {
                 let pipeline_res = TransformationPipeline::execute(
                     provider.as_ref(),
                     arg,

@@ -25,12 +25,12 @@ pub struct ExtractedItem {
 
 // Lazy-initialized regex patterns with proper error handling at compile time
 lazy_static! {
-    static ref RE_FENCED_CODE: Regex = Regex::new(REGEX_FENCED_CODE)
-        .expect("Failed to compile fenced code regex");
-    static ref RE_INLINE_CODE: Regex = Regex::new(REGEX_INLINE_CODE)
-        .expect("Failed to compile inline code regex");
-    static ref RE_FILE_PATH: Regex = Regex::new(REGEX_FILE_PATH)
-        .expect("Failed to compile file path regex");
+    static ref RE_FENCED_CODE: Regex =
+        Regex::new(REGEX_FENCED_CODE).expect("Failed to compile fenced code regex");
+    static ref RE_INLINE_CODE: Regex =
+        Regex::new(REGEX_INLINE_CODE).expect("Failed to compile inline code regex");
+    static ref RE_FILE_PATH: Regex =
+        Regex::new(REGEX_FILE_PATH).expect("Failed to compile file path regex");
 }
 
 pub struct TechnicalParser;
@@ -55,7 +55,10 @@ impl TechnicalParser {
         // 1. Fenced Code Blocks (```rust ... ```)
         for mat in RE_FENCED_CODE.find_iter(input) {
             let original = mat.as_str().to_string();
-            let placeholder = format!("{}{}{}__", PLACEHOLDER_CODE_BLOCK_PREFIX, placeholder_count, "");
+            let placeholder = format!(
+                "{}{}{}__",
+                PLACEHOLDER_CODE_BLOCK_PREFIX, placeholder_count, ""
+            );
             placeholder_count += 1;
 
             placeholders.push(ExtractedItem {
@@ -71,7 +74,10 @@ impl TechnicalParser {
         let input_after_fenced = processed.clone();
         for mat in RE_INLINE_CODE.find_iter(&input_after_fenced) {
             let original = mat.as_str().to_string();
-            let placeholder = format!("{}{}{}__", PLACEHOLDER_INLINE_CODE_PREFIX, placeholder_count, "");
+            let placeholder = format!(
+                "{}{}{}__",
+                PLACEHOLDER_INLINE_CODE_PREFIX, placeholder_count, ""
+            );
             placeholder_count += 1;
 
             placeholders.push(ExtractedItem {
