@@ -60,6 +60,12 @@ Inside **any** chat interface (terminal TUIs like `opencode`/`aider`, VS Code, o
 5. The translated text is automatically copied to your clipboard (just like Ctrl+C).
 6. Paste the translated text wherever you need it (Ctrl+V).
 
+### Manual Skip
+
+To prevent specific words or phrases from being translated, wrap them in double brackets: `[[ content ]]`. The content inside the brackets will be preserved in its original language and format, regardless of spacing between the text and brackets. The brackets themselves are removed in the final output.
+
+Example: `crie uma função [[ Rust ]] em src/main.rs` → "create a function Rust in src/main.rs"
+
 ---
 
 ## Customizing Configuration

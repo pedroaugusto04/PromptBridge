@@ -98,11 +98,10 @@ impl LlmProvider for GoogleTranslateProvider {
 
         // Parse the JSON response (Google Translate returns nested array structure)
         // Use Value to handle complex structure with nulls
-        let response: Value =
-            serde_json::from_str(&response_text).map_err(|e| PromptBridgeError::Provider {
-                provider: "GoogleTranslate".to_string(),
-                message: format!("Failed to parse Google Translate response: {}", e),
-            })?;
+        let response: Value = serde_json::from_str(&response_text).map_err(|e| PromptBridgeError::Provider {
+            provider: "GoogleTranslate".to_string(),
+            message: format!("Failed to parse Google Translate response: {}", e),
+        })?;
 
         // Extract translated text from the nested array structure
         // Format: [[["translated", "original", null, 5], ...], null, "target_lang", ...]

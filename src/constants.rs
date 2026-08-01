@@ -68,11 +68,13 @@ pub const PLACEHOLDER_PREFIX: &str = "__PB_";
 pub const PLACEHOLDER_CODE_BLOCK_PREFIX: &str = "__PB_CODE_BLOCK_";
 pub const PLACEHOLDER_INLINE_CODE_PREFIX: &str = "__PB_CODE_INLINE_";
 pub const PLACEHOLDER_PATH_PREFIX: &str = "__PB_PATH_";
+pub const PLACEHOLDER_MANUAL_SKIP_PREFIX: &str = "__PB_MANUAL_SKIP_";
 
 /// Regex patterns for technical content identification
 pub const REGEX_FENCED_CODE: &str = r"(?s)```[a-zA-Z0-9_-]*\n.*?```|```.*?```";
 pub const REGEX_INLINE_CODE: &str = r"`[^`\n]+`";
 pub const REGEX_FILE_PATH: &str = r#"(?i)\b(?:[a-z]:\\|/|\./|\.\./|[a-z0-9_.-]+/[a-z0-9_.-]+(?:\.[a-z0-9]+)?|[a-z0-9_.-]+\.(?:rs|ts|js|py|json|toml|yaml|yml|md|html|css|cpp|c|h|go|java|sh|ps1))\b"#;
+pub const REGEX_MANUAL_SKIP: &str = r"\[\[\s*.*?\s*\]\]";
 
 /// Default configuration template
 pub const DEFAULT_CONFIG_TOML: &str = r#"

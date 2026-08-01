@@ -1,7 +1,8 @@
 use crate::constants::{
     MAX_EXTRACTED_ITEMS, MAX_PROMPT_SIZE_BYTES, MAX_RESPONSE_SIZE_BYTES,
-    PLACEHOLDER_CODE_BLOCK_PREFIX, PLACEHOLDER_INLINE_CODE_PREFIX, PLACEHOLDER_PATH_PREFIX,
-    PLACEHOLDER_PREFIX, REGEX_FENCED_CODE, REGEX_FILE_PATH, REGEX_INLINE_CODE,
+    PLACEHOLDER_CODE_BLOCK_PREFIX, PLACEHOLDER_INLINE_CODE_PREFIX, PLACEHOLDER_MANUAL_SKIP_PREFIX,
+    PLACEHOLDER_PATH_PREFIX, PLACEHOLDER_PREFIX, REGEX_FENCED_CODE, REGEX_FILE_PATH,
+    REGEX_INLINE_CODE, REGEX_MANUAL_SKIP,
 };
 use crate::utils::error::{PromptBridgeError, Result};
 use lazy_static::lazy_static;
@@ -14,6 +15,7 @@ pub enum TechnicalKind {
     InlineCode,
     FilePath,
     ShellCommand,
+    ManualSkip,
 }
 
 #[derive(Debug, Clone)]
@@ -31,12 +33,14 @@ lazy_static! {
         Regex::new(REGEX_INLINE_CODE).expect("Failed to compile inline code regex");
     static ref RE_FILE_PATH: Regex =
         Regex::new(REGEX_FILE_PATH).expect("Failed to compile file path regex");
+    static ref RE_MANUAL_SKIP: Regex =
+        Regex::new(REGEX_MANUAL_SKIP).expect("Failed to compile manual skip regex");
 }
 
 pub struct TechnicalParser;
 
 impl TechnicalParser {
-    /// Extracts technical elements (code blocks, inline code, file paths, shell commands)
+    /// Extracts technical elements (code blocks, inline code, file paths, shell commands, manual skip content)
     /// and replaces them with safe unique placeholder strings.
     pub fn extract(input: &str) -> Result<(String, Vec<ExtractedItem>)> {
         // Validate input size to prevent memory exhaustion
@@ -52,7 +56,31 @@ impl TechnicalParser {
         let mut placeholder_count = 0;
         let mut processed = input.to_string();
 
-        // 1. Fenced Code Blocks (```rust ... ```)
+        // 1. Manual Skip Content ([[ content ]])
+        for mat in RE_MANUAL_SKIP.find_iter(input) {
+            let original_with_brackets = mat.as_str().to_string();
+            // Strip brackets to preserve only the content
+            let original_content = original_with_brackets
+                .trim_start_matches("[[")
+                .trim_end_matches("]]")
+                .trim()
+                .to_string();
+            let placeholder = format!(
+                "{}{}{}__",
+                PLACEHOLDER_MANUAL_SKIP_PREFIX, placeholder_count, ""
+            );
+            placeholder_count += 1;
+
+            placeholders.push(ExtractedItem {
+                placeholder: placeholder.clone(),
+                original_text: original_content,
+                kind: TechnicalKind::ManualSkip,
+            });
+
+            processed = processed.replace(&original_with_brackets, &placeholder);
+        }
+
+        // 2. Fenced Code Blocks (```rust ... ```)
         for mat in RE_FENCED_CODE.find_iter(input) {
             let original = mat.as_str().to_string();
             let placeholder = format!(
@@ -70,7 +98,7 @@ impl TechnicalParser {
             processed = processed.replace(&original, &placeholder);
         }
 
-        // 2. Inline Code (`code_snippet`)
+        // 3. Inline Code (`code_snippet`)
         let input_after_fenced = processed.clone();
         for mat in RE_INLINE_CODE.find_iter(&input_after_fenced) {
             let original = mat.as_str().to_string();
@@ -89,7 +117,7 @@ impl TechnicalParser {
             processed = processed.replace(&original, &placeholder);
         }
 
-        // 3. File Paths (e.g. src/api/v1.rs, C:\Users\path\file.txt, ./config.toml)
+        // 4. File Paths (e.g. src/api/v1.rs, C:\Users\path\file.txt, ./config.toml)
         let input_after_inline = processed.clone();
         for mat in RE_FILE_PATH.find_iter(&input_after_inline) {
             let original = mat.as_str().to_string();

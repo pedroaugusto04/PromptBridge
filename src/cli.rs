@@ -5,7 +5,7 @@ use std::path::PathBuf;
 #[command(
     name = "promptbridge",
     author = "PromptBridge Contributors",
-    version = "1.0.4",
+    version = "1.0.5",
     about = "A quick CLI tool that translates coding prompts via global hotkey. Translated text is automatically copied to clipboard."
 )]
 pub struct Cli {
